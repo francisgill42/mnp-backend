@@ -1,0 +1,114 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Product;
+use Illuminate\Http\Request;
+use DB;
+use Illuminate\Support\Str;
+
+
+class ProductController extends Controller
+{
+     public function __construct()
+    {
+        $this->middleware('auth:api')->except('register','login','logout');
+    }
+    public function index()
+    {
+        return Product::all();
+             // 'id as product_id',
+            // 'product_title',
+            // 'product_description',	
+            // 'product_price',
+            // 'product_image',
+            // 'expiry_date as product_expiry'
+    }
+
+    public function store(Request $request)
+    {
+        $product_image = 'no_image.png';
+        if($request->hasFile('product_image')){
+           $product_image = $request->product_image->getClientOriginalName();
+           $request->product_image->move(public_path('uploads/product_images/'),$product_image);
+           $product_image = asset('uploads/product_images/' . $product_image);
+        }
+            $data = Product::create($this->fields($request,$product_image));
+
+            $retVal = ($data) 
+            ?  ['response_status' => true, 'message' => 'record has been inserted', 'new_record' => Product::find($data->id)]
+            :  ['response_status' => false,'message' => 'record cannot create'];
+
+            return response()->json($retVal);
+    }
+
+     public function update(Request $request,$id){
+        // return $request->all();
+        if($request->hasFile('product_image')){
+            $product_image = $request->product_image->getClientOriginalName();
+            $request->product_image->move(public_path('uploads/product_images/'),$product_image);
+            $product_image = asset('uploads/product_images/' . $product_image);
+        }
+        else{
+            $product_image = $request->product_image;
+        }
+
+
+         $updated = DB::table('Products')->where('id',$id)->update($this->fields($request,$product_image));
+
+         $data = DB::table('products')->where('id',$id)->first();
+        // $data = DB::table('categories')
+        // ->join('products', 'categories.id', '=', 'products.product_category_id')
+        // ->select('categories.id as product_category_id','categories.category','products.*')
+        // ->where('products.id',$id)
+        // ->first();
+
+        if ($updated) {
+
+         return response()->json([
+            'response_status' => true,
+            'message' => 'record has been updated', 
+            'updated_record' => $data
+         ]);
+
+    }
+    else{
+        return response()->json([
+            'response_status' => false,
+            'message' => 'record cannot update', 
+     ]);
+    }
+
+}
+
+    public function destroy($id){
+     //   return $id;
+        return (Product::find($id)->delete()) 
+                ? [ 'response_status' => true,  'message' => 'record has been deleted' ] 
+                : [ 'response_status' => false, 'message' => 'record cannot delete' ];
+            
+
+    }
+
+    public function fields($request,$product_image)
+    {
+        return [
+             
+            'product_title' => $request->product_title,
+            'legacy_code_sku' => $request->legacy_code_sku,
+            'product_price' => $request->product_price,
+            'product_image' => $product_image,
+            'unit_of_measurement' => $request->unit_of_measurement,
+            'product_description' => $request->product_description,
+            'unit_in_case' => $request->unit_in_case,
+            'weight' => $request->weight,
+            'expiry_date' => $request->expiry_date,
+            'IsActive' => $request->IsActive,
+            'product_qty' => $request->product_qty,
+            'created_at' => now(),
+            'updated_at' => now() 
+        
+
+        ];
+    }
+}
