@@ -32,3 +32,4 @@ Route::resource('feedback', 'FeedbackController');
 Route::post('product/{id}', 'ProductController@update');
 Route::delete('product/{id}', 'ProductController@destroy');
 
+Route::resource('order', 'OrderController');

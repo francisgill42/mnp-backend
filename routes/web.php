@@ -11,6 +11,5 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'ProductController@product_form');
+Route::post('/add-product', 'ProductController@add_product');
