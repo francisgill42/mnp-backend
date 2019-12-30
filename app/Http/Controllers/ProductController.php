@@ -6,13 +6,14 @@ use App\Product;
 use Illuminate\Http\Request;
 use DB;
 use Illuminate\Support\Str;
-
+use Illuminate\Http\File;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
      public function __construct()
     {
-        $this->middleware('auth:api')->except('register','login','logout');
+        //$this->middleware('auth:api')->except('register','login','logout');
     }
     public function index()
     {
@@ -104,11 +105,57 @@ class ProductController extends Controller
             'weight' => $request->weight,
             'expiry_date' => $request->expiry_date,
             'IsActive' => $request->IsActive,
-            'product_qty' => $request->product_qty,
             'created_at' => now(),
             'updated_at' => now() 
         
 
         ];
+    }
+    public function product_form(){
+        return view('add_product');
+    }
+    public function add_product(Request $request){
+   
+        $validate = $this->validate($request ,[
+            'product_title'      => 'required',
+            'sku_code'      => 'required',
+            'product_price'  => 'required',
+            'expiry_date' => 'required',
+            'unit_of_measurement' => 'required',
+            'unit_in_case' => 'required',
+            'weight' => 'required',
+            'description' => 'required',
+            'file' => 'required',
+            
+        ]);
+
+
+        if($request->status){
+            $status = 1;
+        }
+        else{
+            $status = 0;
+        }
+
+        $uploads = $request->file->move(public_path('uploads/product_images'), $request->file->getClientOriginalName());
+        $product = Product::create([
+            'legacy_code_sku'       => $request->sku_code,
+            'product_title'         => $request->product_title,
+            'product_price'         => $request->product_price,
+            'product_image'         => $request->file->getClientOriginalName(),
+            'unit_of_measurement'   => $request->unit_of_measurement,
+            'product_description'   => $request->description,
+            'unit_in_case'          => $request->unit_in_case,
+            'weight'                => $request->weight,
+            'expiry_date'           => $request->expiry_date,
+            'IsActive'              => $status
+       ]);
+        
+       if($product){
+            return redirect('/')->with('msg', 'Your Product Added Successfully!');
+        }
+        else{
+            return redirect('/')->with('msg', 'Product not Added. Try Again.....');
+        }
     }
 }

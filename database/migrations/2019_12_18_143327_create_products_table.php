@@ -18,7 +18,6 @@ class CreateProductsTable extends Migration
             $table->string('legacy_code_sku');
             $table->string('product_title');
             $table->decimal('product_price', 10, 2)->default(0);
-            $table->decimal('product_qty',10, 2);
             $table->string('product_image')->nullable();
             $table->decimal('unit_in_case',10, 2)->nullable();
             $table->string('expiry_date');
