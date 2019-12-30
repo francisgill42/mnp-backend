@@ -35,3 +35,5 @@ Route::delete('product/{id}', 'ProductController@destroy');
 Route::resource('order', 'OrderController');
 
 Route::post('status_change', 'OrderController@status_change');
+
+Route::resource('stock', 'StockController');

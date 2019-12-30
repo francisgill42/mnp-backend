@@ -13,11 +13,13 @@ class ProductController extends Controller
 {
      public function __construct()
     {
-        $this->middleware('auth:api');
+        //$this->middleware('auth:api');
     }
     public function index()
     {
-        return Product::all();
+        $products = new Product;
+        return $products->get_products_with_stock();
+        //return Product::all();
              // 'id as product_id',
             // 'product_title',
             // 'product_description',	

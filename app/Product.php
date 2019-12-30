@@ -42,6 +42,14 @@ class Product extends Model
 		//    )
 	    //    ->orderBy('products.id','desc')
 	    //    ->get();
-         
+		 
+		
+		public static function get_products_with_stock(){
+			return DB::table('products')
+			->join('stocks', 'products.id', '=', 'stocks.product_id')
+			->select('stocks.stock','products.*')
+			->get();
+		  
+		 }
 
 }
