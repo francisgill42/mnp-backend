@@ -9,6 +9,10 @@ use App\Status;
 use App\Product;
 class OrderController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api')->except('register','login','logout');
+    }
     /**
      * Display a listing of the resource.
      *
