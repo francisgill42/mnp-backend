@@ -11,8 +11,9 @@ class Order extends Model
     public function fetch_orders_with_customer_and_status(){
         $orders = DB::table('orders')
             ->join('users', 'orders.customer_id', '=', 'users.id')
+            ->join('customer_categories', 'users.customer_category_id', '=', 'customer_categories.id')
             ->join('statuses', 'orders.order_status_id', '=', 'statuses.id')
-            ->select('orders.*', 'statuses.status', 'users.name')
+            ->select('orders.*', 'statuses.status', 'users.name', 'customer_categories.customer_category_name')
             ->whereNotIn('statuses.status', ['closed'])
             ->get();
 
