@@ -85,12 +85,12 @@ class OrderController extends Controller
         $fetch_items = Order_item::where('order_id',$order->id)->get();
         foreach($fetch_items as $pro){
             $product = Product::find($pro->product_id);
-            $product_arr[$i]['product_id'] = $product->id;
-            $product_arr[$i]['product_title'] = $product->product_title;
-            $product_arr[$i]['product_description'] = $product->product_description;
-            $product_arr[$i]['expiry_date'] = $product->expiry_date;
-            $product_arr[$i]['product_price'] = $product->product_price;
-            $product_arr[$i]['product_quantity'] = $pro->product_quantity;
+            $product_arr[$i]['product_id'] = $product->id??0;
+            $product_arr[$i]['product_title'] = $product->product_title??"";
+            $product_arr[$i]['product_description'] = $product->product_description??"";
+            $product_arr[$i]['expiry_date'] = $product->expiry_date??"";
+            $product_arr[$i]['product_price'] = $product->product_price??"";
+            $product_arr[$i]['product_quantity'] = $pro->product_quantity??"";
             $i++;
         }
 
