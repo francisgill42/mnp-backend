@@ -105,7 +105,6 @@ class ProductController extends Controller
             'weight' => $request->weight,
             'expiry_date' => $request->expiry_date,
             'IsActive' => $request->IsActive,
-            'product_qty' => $request->product_qty,
             'created_at' => now(),
             'updated_at' => now() 
         
@@ -120,7 +119,6 @@ class ProductController extends Controller
         $validate = $this->validate($request ,[
             'product_title'      => 'required',
             'sku_code'      => 'required',
-            'product_quantity'     => 'required',
             'product_price'  => 'required',
             'expiry_date' => 'required',
             'unit_of_measurement' => 'required',
@@ -150,8 +148,7 @@ class ProductController extends Controller
             'unit_in_case'          => $request->unit_in_case,
             'weight'                => $request->weight,
             'expiry_date'           => $request->expiry_date,
-            'IsActive'              => $status,
-            'product_qty'           => $request->product_quantity
+            'IsActive'              => $status
        ]);
         
        if($product){

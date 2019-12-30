@@ -19,7 +19,6 @@ class Product extends Model
 		'weight',
 		'expiry_date',
 		'IsActive',
-		'product_qty',
         ];
 
          public static function get_products_with_categories(){
