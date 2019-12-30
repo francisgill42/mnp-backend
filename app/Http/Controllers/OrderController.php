@@ -16,6 +16,14 @@ class OrderController extends Controller
      */
     public function index()
     {
+        $order = new Order;
+        $orders_arr = array();
+        $orders = $order->fetch_orders_with_customer_and_status();
+        foreach($orders as $ord){
+            $ord->products = $order->fetch_orderitems_with_quantity($ord->id);
+            $orders_arr[] = $ord;
+        }
+        return response($orders_arr);
         
     }
 
@@ -138,8 +146,26 @@ class OrderController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+
+    public function status_change(Request $request)
     {
-        //
+        $order_id = $request->order_id;
+        $status_id = $request->status_id;
+        if(!$order_id){
+            $msg = "You must have to select order";
+        }
+        else if(!$status_id){
+            $msg = "You must have to select Status";
+        }
+        else{
+            $update = Order::where('id', $order_id)->update(['order_status_id'=>$status_id]);
+            if($update){
+                $msg = "Status Changed Successfully";
+            }
+            else{
+                $msg = "Status not Changed. Try Again";
+            }
+        }
+        return response(['msg'=>$msg]);
     }
 }
