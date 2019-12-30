@@ -55,7 +55,7 @@ class ProductController extends Controller
         }
 
 
-         $updated = DB::table('Products')->where('id',$id)->update($this->fields($request,$product_image));
+         $updated = DB::table('products')->where('id',$id)->update($this->fields($request,$product_image));
 
          $data = DB::table('products')->where('id',$id)->first();
         // $data = DB::table('categories')
