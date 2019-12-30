@@ -13,7 +13,7 @@ class ProductController extends Controller
 {
      public function __construct()
     {
-        //$this->middleware('auth:api')->except('register','login','logout');
+        $this->middleware('auth:api')->except('register','login','logout');
     }
     public function index()
     {
