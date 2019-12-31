@@ -14,6 +14,9 @@ Route::post('logout', 'AuthController@logout');
 
 Route::resource('user', 'UserController');
 Route::resource('customer', 'CustomerController');
+Route::resource('coldstorage', 'ColdstorageController');
+Route::resource('driver', 'DriverController');
+Route::resource('maintenance', 'MaintenanceController');
 
 Route::post('update_password/{id}', 'CustomerController@update_password');
 
