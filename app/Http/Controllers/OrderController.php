@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Order;
 use App\Order_item;
 use App\Status;
@@ -171,5 +172,17 @@ class OrderController extends Controller
             }
         }
         return response(['msg'=>$msg]);
+    }
+
+    public function get_orders_by_user(){
+        $id = Auth::id();
+        $order = new Order;
+        $orders_arr = array();
+        $orders = $order->fetch_orders_by_customer($id);
+        foreach($orders as $ord){
+            $ord->products = $order->fetch_orderitems_with_quantity($ord->id);
+            $orders_arr[] = $ord;
+        }
+        return response($orders_arr);
     }
 }
