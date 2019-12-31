@@ -25,7 +25,7 @@ class Order extends Model
     public function fetch_orderitems_with_quantity($order_id){
         $items = DB::table('order_items')
             ->join('products', 'order_items.product_id', '=', 'products.id')
-            ->select('order_items.product_quantity', 'products.*')
+            ->select('order_items.id as item_id', 'order_items.product_quantity', 'products.*')
             ->where('order_items.order_id', '=', $order_id)
             ->get();
 
