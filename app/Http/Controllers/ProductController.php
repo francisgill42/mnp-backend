@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Product;
+use App\Stock;
 use Illuminate\Http\Request;
 use DB;
 use Illuminate\Support\Str;
@@ -17,9 +18,16 @@ class ProductController extends Controller
     }
     public function index()
     {
-        $products = new Product;
-        return $products->get_products_with_stock();
-        //return Product::all();
+        //$products = new Product;
+        //return $products->get_products_with_stock();
+        $all_products = array();
+        $products = Product::all();
+        foreach($products as $product){
+            $stock = Stock::find($product->id);
+            $product->stock = $stock['stock'];
+            $all_products[] = $product;
+        }
+        return $all_products;
              // 'id as product_id',
             // 'product_title',
             // 'product_description',	
