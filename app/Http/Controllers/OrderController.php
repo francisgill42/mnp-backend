@@ -95,13 +95,13 @@ class OrderController extends Controller
             $i++;
         }
 
-        $order_arr["order_id"] = $order->id;
+        $order_arr["id"] = $order->id;
         $order_arr["order_date"] = $date;
         $order_arr["order_time"] = $time;
         $order_arr["order_total"] = $order->order_total;
         $order_arr["order_tax"] = $order->order_tax;
         $order_arr["order_gross"] = $order->order_gross;
-        $order_arr["order_status"] = $order_status->status;
+        $order_arr["status"] = $order_status->status;
         $order_arr["order_confirmed_date"] = $fetch_order->order_confirmed_date;
         $order_arr["order_shipped_date"] = $fetch_order->order_shipped_date;
         $order_arr["order_delivered_date"] = $fetch_order->order_delivered_date;
@@ -165,22 +165,38 @@ class OrderController extends Controller
         else{
             $update = Order::where('id', $order_id)->update(['order_status_id'=>$status_id]);
             if($update){
+                $arr = array();
+                $status = Status::find($status_id);
+                $arr['id'] = $status->id;
+                $arr['status'] = $status->status;
                 $msg = "Status Changed Successfully";
             }
             else{
                 $msg = "Status not Changed. Try Again";
             }
         }
-        return response(['msg'=>$msg]);
+        return response(['msg'=>$msg, 'Status'=>$arr]);
     }
 
     public function get_orders_by_user(){
+
         $id = Auth::id();
         $order = new Order;
         $orders_arr = array();
         $orders = $order->fetch_orders_by_customer($id);
         foreach($orders as $ord){
-            $ord->products = $order->fetch_orderitems_with_quantity($ord->id);
+
+            $order_date = explode(" ",$ord->updated_at);
+            $date = date("d-m-Y", strtotime($order_date[0]));
+            $time = date("h:i", strtotime($order_date[1]));
+            $ord->order_date = $date;
+            $ord->order_time = $time;
+
+            settype($ord->order_total, "double");
+            settype($ord->order_tax, "double");
+            settype($ord->order_gross, "double");
+
+            $ord->order_products = $order->fetch_orderitems_with_quantity($ord->id);
             $orders_arr[] = $ord;
         }
         return response($orders_arr);
