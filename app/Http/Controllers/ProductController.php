@@ -9,19 +9,24 @@ use DB;
 use Illuminate\Support\Str;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
+use Auth;
 
 class ProductController extends Controller
 {
      public function __construct()
     {
-        //$this->middleware('auth:api');
+        $this->middleware('auth:api');
     }
     public function index()
     {
+        //dd(Auth::user()->master);
         //$products = new Product;
         //return $products->get_products_with_stock();
         $all_products = array();
-        $products = Product::all();
+      $products = (Auth::user()->master) ? Product::all() :
+            Product::where('IsActive',1)->get();
+      
+        
         foreach($products as $product){
             $stocks = Stock::where('product_id',$product->id)->get();
             $product->stock = $stocks;
