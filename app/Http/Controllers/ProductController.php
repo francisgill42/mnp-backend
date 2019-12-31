@@ -23,8 +23,13 @@ class ProductController extends Controller
         $all_products = array();
         $products = Product::all();
         foreach($products as $product){
-            $stock = Stock::find($product->id);
-            $product->stock = $stock['stock'];
+            $stocks = Stock::where('product_id',$product->id)->get();
+            $product->stock = $stocks;
+            if(!empty($stocks)){
+                foreach($stocks as $stock){
+                    $product->stock = $stock->stock;
+                }
+            }
             $all_products[] = $product;
         }
         return $all_products;
