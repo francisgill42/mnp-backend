@@ -8,6 +8,8 @@ use App\Order;
 use App\Order_item;
 use App\Status;
 use App\Product;
+use App\Driver;
+use App\Assign;
 class OrderController extends Controller
 {
     public function __construct()
@@ -156,6 +158,7 @@ class OrderController extends Controller
     {
         $order_id = $request->order_id;
         $status_id = $request->status_id;
+        $arr = array();
         if(!$order_id){
             $msg = "You must have to select order";
         }
@@ -165,7 +168,6 @@ class OrderController extends Controller
         else{
             $update = Order::where('id', $order_id)->update(['order_status_id'=>$status_id]);
             if($update){
-                $arr = array();
                 $status = Status::find($status_id);
                 $arr['id'] = $status->id;
                 $arr['status'] = $status->status;
@@ -201,4 +203,38 @@ class OrderController extends Controller
         }
         return response($orders_arr);
     }
+
+    public function change_order_item(Request $request)
+    {
+        $order_item_id = $request->order_item_id;
+        $product_id = $request->product_id;
+        $item_quantity = $request->item_quantity;
+        $arr = array();
+            $update = Order_item::where('id', $order_item_id)->update(['product_id'=>$product_id, 'product_quantity'=> $item_quantity]);
+            if($update){
+                $product = Product::find($product_id);
+                $arr = $product;
+                $msg = "Order Item Changed Successfully";
+            }
+            else{
+                $msg = "Order Item not Changed. Try Again";
+            }
+        return response(['msg'=>$msg, 'Product'=>$arr]);
+    }
+
+    public function select_drivers(){
+
+        $drivers = Driver::where('role_id',3)->get();
+        $arr = array();
+        $i = 0;
+        if($drivers){
+            foreach($drivers as $driver){
+                $arr[$i]['driver_id'] = $driver->id;
+                $arr[$i]['name'] = $driver->name;
+                $i++;
+            }
+        }
+        return response($arr);
+    }
+
 }
