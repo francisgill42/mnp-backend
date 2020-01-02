@@ -43,6 +43,8 @@ Route::get('processing_orders_by_coldstorage', 'OrderController@get_processing_o
 Route::get('orders_by_coldstorage', 'OrderController@get_orders_by_coldstorage');
 Route::post('change_order_item', 'OrderController@change_order_item');
 Route::get('get_drivers', 'OrderController@select_drivers');
+Route::get('assigned_orders_to_driver', 'OrderController@get_assigned_orders_to_driver');
+Route::get('delivered_orders_by_driver', 'OrderController@get_delivered_orders_by_driver');
 
 
 Route::resource('stock', 'StockController');

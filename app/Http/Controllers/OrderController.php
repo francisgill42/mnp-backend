@@ -183,8 +183,20 @@ class OrderController extends Controller
                 }
             }
 
-
-            $update = Order::where('id', $order_id)->update(['order_status_id'=>$status_id]);
+            $date = date("d-m-Y", strtotime(NOW()));
+            if($status_id == 2){
+                $update = Order::where('id', $order_id)->update(['order_status_id'=>$status_id, 'order_confirmed_date'=>$date]);
+            }
+            else if($status_id == 3){
+                $update = Order::where('id', $order_id)->update(['order_status_id'=>$status_id, 'order_shipped_date'=>$date]);
+            }
+            else if($status_id == 5){
+                $update = Order::where('id', $order_id)->update(['order_status_id'=>$status_id, 'order_delivered_date'=>$date]);
+            }
+            else{
+                $update = Order::where('id', $order_id)->update(['order_status_id'=>$status_id]);
+            }
+            
             if($update){
                 $status = Status::find($status_id);
                 $arr['id'] = $status->id;
@@ -277,6 +289,67 @@ class OrderController extends Controller
         return response($orders_arr);
     }
 
+    public function get_assigned_orders_to_driver(){
+        
+        $user = Auth::user();
+
+        if($user->role_id == 3){
+            $order = new Order;
+            $orders_arr = array();
+            $orders = $order->fetch_assigned_orders_to_driver($user->id); 
+            foreach($orders as $ord){
+
+                $order_date = explode(" ",$ord->updated_at);
+                $date = date("d-m-Y", strtotime($order_date[0]));
+                $time = date("h:i", strtotime($order_date[1]));
+                $ord->order_date = $date;
+                $ord->order_time = $time;
+
+                settype($ord->order_total, "double");
+                settype($ord->order_tax, "double");
+                settype($ord->order_gross, "double");
+
+                $ord->order_products = $order->fetch_orderitems_with_quantity($ord->id);
+                $ord->driver = $order->fetch_assigned_driver_to_order($ord->id);
+                $orders_arr[] = $ord;
+            }
+            return response($orders_arr);
+        }
+        else{
+            return response(['msg'=>'Logged in user in not a driver.']);
+        }
+        
+    }
+
+    public function get_delivered_orders_by_driver(){
+        $user = Auth::user();
+
+        if($user->role_id == 3){
+            $order = new Order;
+            $orders_arr = array();
+            $orders = $order->fetch_delivered_orders_by_driver($user->id); 
+            foreach($orders as $ord){
+
+                $order_date = explode(" ",$ord->updated_at);
+                $date = date("d-m-Y", strtotime($order_date[0]));
+                $time = date("h:i", strtotime($order_date[1]));
+                $ord->order_date = $date;
+                $ord->order_time = $time;
+
+                settype($ord->order_total, "double");
+                settype($ord->order_tax, "double");
+                settype($ord->order_gross, "double");
+
+                $ord->order_products = $order->fetch_orderitems_with_quantity($ord->id);
+                $ord->driver = $order->fetch_assigned_driver_to_order($ord->id);
+                $orders_arr[] = $ord;
+            }
+            return response($orders_arr);
+        }
+        else{
+            return response(['msg'=>'Logged in user in not a driver.']);
+        }
+    }
 
     public function change_order_item(Request $request)
     {
