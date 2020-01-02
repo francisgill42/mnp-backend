@@ -45,5 +45,43 @@ class Order extends Model
 
             return $orders;
     }
+
+    public function fetch_processing_orders_by_coldstorage(){
+        $orders = DB::table('orders')
+            ->join('users', 'orders.customer_id', '=', 'users.id')
+            ->join('customer_categories', 'users.customer_category_id', '=', 'customer_categories.id')
+            ->join('states', 'users.state_id', '=', 'states.id')
+            ->join('cities', 'users.city_id', '=', 'cities.id')
+            ->join('statuses', 'orders.order_status_id', '=', 'statuses.id')
+            ->select('orders.*', 'statuses.status', 'users.id as user_id', 'users.name', 'users.role_id', 'users.customer_category_id', 'users.master', 'users.email', 'users.phone_number', 'users.mobile_number', 'users.ntn', 'users.address', 'users.state_id', 'users.city_id', 'users.password', 'users.IsActive', 'customer_categories.customer_category_name', 'states.state_name', 'cities.city_name')
+            ->where('orders.order_status_id', '=', 2)
+            ->get();
+
+            return $orders;
+    }
+
+    public function fetch_orders_by_coldstorage(){
+        $orders = DB::table('orders')
+            ->join('users', 'orders.customer_id', '=', 'users.id')
+            ->join('customer_categories', 'users.customer_category_id', '=', 'customer_categories.id')
+            ->join('states', 'users.state_id', '=', 'states.id')
+            ->join('cities', 'users.city_id', '=', 'cities.id')
+            ->join('statuses', 'orders.order_status_id', '=', 'statuses.id')
+            ->select('orders.*', 'statuses.status', 'users.id as user_id', 'users.name', 'users.role_id', 'users.customer_category_id', 'users.master', 'users.email', 'users.phone_number', 'users.mobile_number', 'users.ntn', 'users.address', 'users.state_id', 'users.city_id', 'users.password', 'users.IsActive', 'customer_categories.customer_category_name', 'states.state_name', 'cities.city_name')
+            ->whereNotIn('statuses.status', ['closed','processing','cancelled','pending'])
+            ->get();
+
+            return $orders;
+    }
+
+    public function fetch_assigned_driver_to_order($order_id){
+        $orders = DB::table('assigns')
+            ->join('users', 'assigns.driver_id', '=', 'users.id')
+            ->select('users.id as driver_id', 'users.name', 'users.role_id', 'users.customer_category_id', 'users.master', 'users.email', 'users.phone_number', 'users.mobile_number', 'users.ntn', 'users.address', 'users.state_id', 'users.city_id', 'users.password', 'users.IsActive')
+            ->where('assigns.order_id', '=', $order_id)
+            ->get();
+
+            return $orders;
+    }
 }
 

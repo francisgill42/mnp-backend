@@ -39,6 +39,8 @@ Route::resource('order', 'OrderController');
 
 Route::post('status_change', 'OrderController@status_change');
 Route::get('order_by_user', 'OrderController@get_orders_by_user');
+Route::get('processing_orders_by_coldstorage', 'OrderController@get_processing_orders_by_coldstorage');
+Route::get('orders_by_coldstorage', 'OrderController@get_orders_by_coldstorage');
 Route::post('change_order_item', 'OrderController@change_order_item');
 Route::get('get_drivers', 'OrderController@select_drivers');
 

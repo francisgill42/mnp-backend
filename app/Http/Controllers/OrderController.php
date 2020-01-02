@@ -94,6 +94,7 @@ class OrderController extends Controller
             $product_arr[$i]['expiry_date'] = $product->expiry_date??"";
             $product_arr[$i]['product_price'] = $product->product_price??"";
             $product_arr[$i]['product_quantity'] = $pro->product_quantity??"";
+            $product_arr[$i]['legacy_code_sku'] = $product->legacy_code_sku??"";
             $i++;
         }
 
@@ -158,26 +159,49 @@ class OrderController extends Controller
     {
         $order_id = $request->order_id;
         $status_id = $request->status_id;
+        $driver_id = $request->driver_id;
         $arr = array();
-        if(!$order_id){
-            $msg = "You must have to select order";
-        }
-        else if(!$status_id){
-            $msg = "You must have to select Status";
-        }
-        else{
+        $flag = false;
+        
+            if($driver_id){
+                $ord_assign = new Assign;
+                $driver = Assign::where('order_id',$order_id)->get();
+               
+                if(empty($driver[0])){
+                    $assign = Assign::create(['driver_id'=>$driver_id, 'order_id'=>$order_id]);
+                    if($assign){
+                        $status_id = 2;
+                        $flag = true;
+                    }
+                    
+                }
+                else{
+                    $update = Assign::where('id', $driver[0]->id)->update(['driver_id'=>$driver_id, 'order_id'=>$order_id]);
+                    if($update){
+                        $flag = true;
+                    }
+                }
+            }
+
+
             $update = Order::where('id', $order_id)->update(['order_status_id'=>$status_id]);
             if($update){
                 $status = Status::find($status_id);
                 $arr['id'] = $status->id;
                 $arr['status'] = $status->status;
-                $msg = "Status Changed Successfully";
+                $res = true;
+                if($flag){
+                    $msg = "Order Assigned Successfully";
+                }
+                else{
+                    $msg = "Status Changed Successfully";
+                }
             }
             else{
+                $res = false;
                 $msg = "Status not Changed. Try Again";
             }
-        }
-        return response(['msg'=>$msg, 'Status'=>$arr]);
+        return response(['response_status'=>$res, 'message'=>$msg, 'updated_record'=>$arr]);
     }
 
     public function get_orders_by_user(){
@@ -185,7 +209,7 @@ class OrderController extends Controller
         $id = Auth::id();
         $order = new Order;
         $orders_arr = array();
-        $orders = $order->fetch_orders_by_customer($id);
+        $orders = $order->fetch_orders_by_customer($id); 
         foreach($orders as $ord){
 
             $order_date = explode(" ",$ord->updated_at);
@@ -204,6 +228,56 @@ class OrderController extends Controller
         return response($orders_arr);
     }
 
+    public function get_processing_orders_by_coldstorage(){
+        
+        $order = new Order;
+        $orders_arr = array();
+        $orders = $order->fetch_processing_orders_by_coldstorage(); 
+        foreach($orders as $ord){
+
+            $order_date = explode(" ",$ord->updated_at);
+            $date = date("d-m-Y", strtotime($order_date[0]));
+            $time = date("h:i", strtotime($order_date[1]));
+            $ord->order_date = $date;
+            $ord->order_time = $time;
+
+            settype($ord->order_total, "double");
+            settype($ord->order_tax, "double");
+            settype($ord->order_gross, "double");
+
+            $ord->order_products = $order->fetch_orderitems_with_quantity($ord->id);
+            $ord->driver = $order->fetch_assigned_driver_to_order($ord->id);
+            $orders_arr[] = $ord;
+        }
+        return response($orders_arr);
+    }
+
+
+    public function get_orders_by_coldstorage(){
+        
+        $order = new Order;
+        $orders_arr = array();
+        $orders = $order->fetch_orders_by_coldstorage(); 
+        foreach($orders as $ord){
+
+            $order_date = explode(" ",$ord->updated_at);
+            $date = date("d-m-Y", strtotime($order_date[0]));
+            $time = date("h:i", strtotime($order_date[1]));
+            $ord->order_date = $date;
+            $ord->order_time = $time;
+
+            settype($ord->order_total, "double");
+            settype($ord->order_tax, "double");
+            settype($ord->order_gross, "double");
+
+            $ord->order_products = $order->fetch_orderitems_with_quantity($ord->id);
+            $ord->driver = $order->fetch_assigned_driver_to_order($ord->id);
+            $orders_arr[] = $ord;
+        }
+        return response($orders_arr);
+    }
+
+
     public function change_order_item(Request $request)
     {
         $order_item_id = $request->order_item_id;
@@ -213,13 +287,16 @@ class OrderController extends Controller
             $update = Order_item::where('id', $order_item_id)->update(['product_id'=>$product_id, 'product_quantity'=> $item_quantity]);
             if($update){
                 $product = Product::find($product_id);
+                $product->product_quantity = $item_quantity;
                 $arr = $product;
                 $msg = "Order Item Changed Successfully";
+                $res = true;
             }
             else{
                 $msg = "Order Item not Changed. Try Again";
+                $res = false;
             }
-        return response(['msg'=>$msg, 'Product'=>$arr]);
+        return response(['response_status'=>$res, 'message'=>$msg, 'updated_record'=>$arr]);
     }
 
     public function select_drivers(){
