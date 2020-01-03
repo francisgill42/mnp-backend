@@ -5,17 +5,35 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Validator;
 use App\Customer;
-
+use App\Discount;
 class CustomerController extends Controller
 {
 public function __construct()
 {
-$this->middleware('auth:api')->except('register','login','logout');
+$this->middleware('auth:api');
 }
 
 public function index()
 {
-    return Customer::get_customers_with_additionals(); 
+    $arr = array();
+    $customers = Customer::get_customers_with_additionals();
+    foreach($customers as $customer){
+        $customer_category_id = $customer->customer_category_id;
+        $customer->discount_amount = 0;
+        $discount = Discount::all();
+            foreach($discount as $disc){
+                $classes = json_decode($disc->customer_category_id);
+                foreach($classes as $class){
+                    if($class == $customer_category_id){
+                        $customer->discount_type = $disc->discount_type;
+                        $customer->discount_amount = $disc->discount_amount;
+                    }
+                }
+            }
+            $arr[] = $customer;
+    } 
+    return $arr;
+        
 }
 
 

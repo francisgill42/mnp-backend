@@ -353,15 +353,32 @@ class OrderController extends Controller
 
     public function change_order_item(Request $request)
     {
+        $order_id = $request->order_id;
         $order_item_id = $request->order_item_id;
         $product_id = $request->product_id;
         $item_quantity = $request->item_quantity;
         $arr = array();
+        $gross = 0;
             $update = Order_item::where('id', $order_item_id)->update(['product_id'=>$product_id, 'product_quantity'=> $item_quantity]);
             if($update){
-                $product = Product::find($product_id);
-                $product->product_quantity = $item_quantity;
-                $arr = $product;
+                $order = new Order;
+                $order_items = $order->fetch_orderitems_with_quantity($order_id);
+                foreach($order_items as $item){
+                    $gross += $item->product_price*$item->product_quantity;
+                    if($item->order_item_id == $order_item_id){
+                        $items_arr = $item;
+                    }
+                }
+                $tax = ($gross/100)*5;
+                $total = $gross+$tax;
+                $update = Order::where('id', $order_id)->update(['order_total'=>$total, 'order_tax'=>$tax, 'order_gross'=>$gross]);
+                if($update){
+                    $orders = $order->fetch_orders_by_id($order_id);  
+                    foreach($orders as $ord){
+                        $ord->products = $items_arr;
+                    }
+                }
+
                 $msg = "Order Item Changed Successfully";
                 $res = true;
             }
@@ -369,7 +386,7 @@ class OrderController extends Controller
                 $msg = "Order Item not Changed. Try Again";
                 $res = false;
             }
-        return response(['response_status'=>$res, 'message'=>$msg, 'updated_record'=>$arr]);
+        return response(['response_status'=>$res, 'message'=>$msg, 'updated_record'=>$ord]);
     }
 
     public function select_drivers(){

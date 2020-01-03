@@ -29,6 +29,7 @@ class Driver extends Authenticatable
            'users.*',
            'states.id as state_id','states.state_name',
            'cities.id as city_id','cities.city_name')
+          ->where('users.role_id', '=', 3) 
           ->orderBy('users.id','desc')
           ->get();
     }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Product;
 use App\Stock;
+use App\Discount;
 use Illuminate\Http\Request;
 use DB;
 use Illuminate\Support\Str;
@@ -19,14 +20,11 @@ class ProductController extends Controller
     }
     public function index()
     {
-        //dd(Auth::user()->master);
-        //$products = new Product;
-        //return $products->get_products_with_stock();
         $all_products = array();
       $products = (Auth::user()->master) ? Product::all() :
             Product::where('IsActive',1)->get();
       
-        
+      $role_id = Auth::user()->role_id;      
         foreach($products as $product){
             $stocks = Stock::where('product_id',$product->id)->get();
             $product->stock = $stocks;
@@ -35,6 +33,20 @@ class ProductController extends Controller
                     $product->stock = $stock->stock;
                 }
             }
+
+        if($role_id == 1){
+            $customer_category_id = Auth::user()->customer_category_id;
+            $discount = Discount::all();
+            foreach($discount as $disc){
+                $classes = json_decode($disc->customer_category_id);
+                foreach($classes as $class){
+                    if($class == $customer_category_id){
+                        $product->discount = $disc;
+                    }
+                }
+            }
+
+        }
             $all_products[] = $product;
         }
         return $all_products;
