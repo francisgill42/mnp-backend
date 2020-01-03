@@ -48,3 +48,6 @@ Route::get('delivered_orders_by_driver', 'OrderController@get_delivered_orders_b
 
 
 Route::resource('stock', 'StockController');
+
+Route::resource('discount', 'DiscountController');
+Route::post('update_discount', 'DiscountController@update_discount');
