@@ -37,6 +37,7 @@ class ProductController extends Controller
         if($role_id == 1){
             $customer_category_id = Auth::user()->customer_category_id;
             $discount = Discount::all();
+            $product->discount = null;
             foreach($discount as $disc){
                 $classes = json_decode($disc->customer_category_id);
                 foreach($classes as $class){
