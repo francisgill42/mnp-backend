@@ -25,12 +25,26 @@ class OrderController extends Controller
     {
         $order = new Order;
         $orders_arr = array();
+        $options = array();
         $orders = $order->fetch_orders_with_customer_and_status();
+        $opt = $orders->getOptions();
+        $options['current_page'] = $orders->currentPage();
+        $options['total'] = $orders->total();
+        $options['count'] = $orders->count();
+        $options['path'] = $opt['path'];
+        $options['more_pages'] = $orders->hasMorePages();
+        $options['last_page'] = $orders->lastPage();
+        $options['next_page_url'] = $orders->nextPageUrl();
+        $options['on_first_page'] = $orders->onFirstPage();
+        $options['per_page'] = $orders->perPage();
+        $options['previous_page_url'] = $orders->previousPageUrl();
+        
         foreach($orders as $ord){
             $ord->products = $order->fetch_orderitems_with_quantity($ord->id);
             $orders_arr[] = $ord;
         }
-        return response($orders_arr);
+        $options['orders'] = $orders_arr;
+        return response()->json(['data'=>$options], 200);
         
     }
 
@@ -59,7 +73,8 @@ class OrderController extends Controller
             'customer_id' => $request->customer_id,
             'order_total' => $request->order_total,
             'order_tax'   => $request->order_tax,
-            'order_gross' => $request->order_gross
+            'order_gross' => $request->order_gross,
+            'discounted_price' => $request->discounted_price
         ]);
         if(isset($order->id)){
             foreach($request->products as $item){
@@ -108,6 +123,7 @@ class OrderController extends Controller
         $order_arr["order_confirmed_date"] = $fetch_order->order_confirmed_date;
         $order_arr["order_shipped_date"] = $fetch_order->order_shipped_date;
         $order_arr["order_delivered_date"] = $fetch_order->order_delivered_date;
+        $order_arr["discounted_price"] = $order->discounted_price;
         $order_arr["order_products"] = $product_arr;
 
         return response($order_arr);

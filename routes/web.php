@@ -13,3 +13,8 @@
 
 Route::get('/', 'ProductController@product_form');
 Route::post('/add-product', 'ProductController@add_product');
+
+/*Route::get('/update_req', function(){
+    return view('update_req');
+});
+Route::post('request_update', 'MaintenanceUserController@request_update');*/

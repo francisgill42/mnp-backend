@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 Route::post('login', 'AuthController@login');
 Route::post('register', 'AuthController@register');
 
+Route::post('admin_login', 'AdminController@login');
+
 Route::post('migrate:fresh', function (){
     return Artisan::call('migrate:fresh');
 });
@@ -51,3 +53,7 @@ Route::resource('stock', 'StockController');
 
 Route::resource('discount', 'DiscountController');
 Route::post('update_discount', 'DiscountController@update_discount');
+
+Route::resource('maintenanceuser', 'MaintenanceUserController');
+Route::post('request_status_change', 'MaintenanceUserController@request_status_change');
+Route::post('request_update', 'MaintenanceUserController@request_update');
