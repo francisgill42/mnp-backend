@@ -117,16 +117,12 @@ $updated = \DB::table('users')->where('id',$id)->update($arr);
 if ($updated) {
 
 $user =  \DB::table('users')
-->join('customer_categories', 'users.customer_category_id', '=', 'customer_categories.id')
 ->join('states', 'users.state_id', '=', 'states.id')
 ->join('cities', 'users.city_id', '=', 'cities.id')
 ->select(
     'users.*',
-    'customer_categories.id as customer_category_id','customer_categories.customer_category_name',
     'states.id as state_id','states.state_name',
     'cities.id as city_id','cities.city_name')
-
-//->select('users.*','customer_categories.customer_category_name','states.state_name','cities.city_name')
 ->where('users.id',$id)
 ->first();
 

@@ -15,7 +15,7 @@ class DiscountController extends Controller
     public function index()
     {
         $data = array();
-        $discounts = Discount::all();
+        $discounts = Discount::orderBy('id', 'desc')->get();
         foreach($discounts as $disc){
             $categories = json_decode($disc->customer_category_id);
             $cat_arr = array();
@@ -56,6 +56,13 @@ class DiscountController extends Controller
             if($insert){
                 $res = true;
                 $msg = "Discount Added Successfully";
+
+                $categories = json_decode($customer_category_ids);
+                $cat_arr = array();
+                foreach($categories as $category){
+                    $cat_arr[] = CustomerCategory::find($category); 
+                }
+                $insert->categories = $cat_arr;
             }
 
         return response(['response_status'=>$res, 'message'=>$msg, 'new_record'=>$insert]);
@@ -64,6 +71,14 @@ class DiscountController extends Controller
 
     public function update_discount(Request $request){
 
+    }
+
+
+    public function show($id){
+        
+    }
+    public function update(Request $request, $id)
+    {
         $validator = Validator::make($request->all(), [ 
             'customer_category_ids' => 'required', 
             'discount_type' => 'required', 
@@ -83,7 +98,6 @@ class DiscountController extends Controller
         $discount_type = $request->discount_type;
         $discount_title = $request->discount_title;
         $discount_amount = $request->discount_amount;
-        $id = $request->id;
         $res = false;
         $msg = "";
         $data = array();
@@ -109,9 +123,8 @@ class DiscountController extends Controller
 
         return response(['response_status'=>$res, 'message'=>$msg, 'updated_record'=>$fetch]);
     }
-
-
-    public function show($id){
+    public function destroy($id)
+    {
         $delete = Discount::where('id', $id)->delete();
         if($delete){
             $msg = "Discount Deleted Successfully";
