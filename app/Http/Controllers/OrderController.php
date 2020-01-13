@@ -521,7 +521,7 @@ class OrderController extends Controller
  
         //$mail = Mail::to($customer_email)->bcc($cs->email)->bcc($driver->email)->send(new Emailsend($data));
         //$mail = Mail::to("aizaz.hussain@orangeroomdigital.com")->send(new Emailsend($data));
-        return view('invoice', $data);
+        //return view('invoice', $data);
 
     }
 

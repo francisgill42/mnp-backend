@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\User;
 use App\Role;
+use App\Order;
+use App\Product;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 class AdminController extends Controller
@@ -36,5 +38,16 @@ class AdminController extends Controller
 		else{ 
 		return response()->json(['error'=>'email or password is incorrect'], 422); 
 		} 
+	}
+	public function counters(){
+		$customers = User::where(['role_id'=>1])->count();
+		$orders = Order::count();
+		$products = Product::count();
+		$count = array();
+		$count['customers'] = $customers;
+		$count['orders'] = $orders;
+		$count['products'] = $products;
+
+		return response($count);
 	}
 }

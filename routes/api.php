@@ -57,3 +57,5 @@ Route::post('update_discount', 'DiscountController@update_discount');
 Route::resource('maintenanceuser', 'MaintenanceUserController');
 Route::post('request_status_change', 'MaintenanceUserController@request_status_change');
 Route::post('request_update', 'MaintenanceUserController@request_update');
+
+Route::get('counters', 'AdminController@counters');

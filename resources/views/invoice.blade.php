@@ -298,6 +298,13 @@
                 <td colspan="3"></td>
                 
                 <td colspan="3" style="font-weight:bold;border-top: 2px solid #eee;">
+                   Discounted Price: AED <?php echo $order->discounted_price?$order->discounted_price:'0.00'; ?>
+                </td>
+            </tr>
+            <tr class="total" style="text-align:right;">
+                <td colspan="3"></td>
+                
+                <td colspan="3" style="font-weight:bold;border-top: 2px solid #eee;">
                    Grand Total: AED <?php echo $order->order_total; ?>
                 </td>
             </tr>
