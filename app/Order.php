@@ -48,6 +48,7 @@ class Order extends Model
 
             return $items;
     }
+    
     public function fetch_orders_by_customer($customer_id){
         $orders = DB::table('orders')
             ->join('users', 'orders.customer_id', '=', 'users.id')

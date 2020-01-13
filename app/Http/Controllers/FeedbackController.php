@@ -40,8 +40,17 @@ class FeedbackController extends Controller
     }
 
 
-    public function destroy(Feedback $feedback)
+    public function destroy($id)
     {
-        //
+        $feedback = Feedback::find($id);
+        if($feedback){
+            $delete = Feedback::where('id',$id)->delete();
+            if($delete){
+                return response(['response_status' => true,'message' => 'record has been deleted']);
+            }
+            else{
+                return response(['response_status' => false,'message' => 'record not deleted']);
+            }
+        }
     }
 }

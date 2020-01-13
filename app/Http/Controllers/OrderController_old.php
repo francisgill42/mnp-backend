@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Mail;
-use App\Mail\Emailsend;
 use App\Order;
 use App\Order_item;
 use App\Status;
@@ -13,8 +11,6 @@ use App\Product;
 use App\Driver;
 use App\Assign;
 use App\Stock;
-use App\User;
-use App\Invoice;
 class OrderController extends Controller
 {
     public function __construct()
@@ -46,26 +42,23 @@ class OrderController extends Controller
         
         foreach($orders as $ord){
             $ord->products = $order->fetch_orderitems_with_quantity($ord->id);
-            foreach($ord->products as $ord_items){
-                $stock = Stock::where(['product_id'=>$ord_items->id])->first();
-                if($stock){
-                    $ord_items->stock = $stock->stock;
-                }
-                else{
-                    $ord_items->stock = 'Stock does not exist';
-                }
-               
-            }
             $orders_arr[] = $ord;
         }
-        //dump($ord->products);
         $options['orders'] = $orders_arr;
-        return response()->json($options, 200);
+        return response()->json(['data'=>$options], 200);
         
     }
-    
 
-  
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        //
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -138,35 +131,35 @@ class OrderController extends Controller
         
     }
 
-    public function search_order($q){
-    	
-    	 $order = new Order;
-        $orders_arr = array();
-        $options = array();
-        $orders = $order->fetch_orders_with_customer_and_status_with_search($q);
-        $opt = $orders->getOptions();
-        $options['current_page'] = $orders->currentPage();
-        $options['total'] = $orders->total();
-        $options['count'] = $orders->count();
-        $options['path'] = $opt['path'];
-        $options['more_pages'] = $orders->hasMorePages();
-        $options['last_page'] = $orders->lastPage();
-        $options['next_page_url'] = $orders->nextPageUrl();
-        $options['on_first_page'] = $orders->onFirstPage();
-        $options['per_page'] = $orders->perPage();
-        $options['previous_page_url'] = $orders->previousPageUrl();
-        
-        foreach($orders as $ord){
-            $ord->products = $order->fetch_orderitems_with_quantity($ord->id);
-            $orders_arr[] = $ord;
-        }
-        $options['orders'] = $orders_arr;
-        return response()->json($options, 200);
-    	
-    }	
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        //
+    }
 
-    
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        //
+    }
 
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function update(Request $request, $id)
     {
         //
@@ -187,9 +180,9 @@ class OrderController extends Controller
         $arr = array();
         $flag = false;
         $stock_status = false;
-
+        
             if($driver_id){
-
+                
                 $items = Order_item::where(['order_id'=>$order_id])->get();
                 foreach($items as $item){   
                     $stock = Stock::where(['product_id'=> $item->product_id])->get();
@@ -226,8 +219,7 @@ class OrderController extends Controller
                     if($assign){
                         $status_id = 2;
                         $flag = true;
-                    }
-                    
+                    } 
                 }
                 else{
                     $update = Assign::where('id', $driver[0]->id)->update(['driver_id'=>$driver_id, 'order_id'=>$order_id]);
@@ -236,25 +228,6 @@ class OrderController extends Controller
                         $flag = true;
                     }
                 }
-
-                $driver = User::find($driver_id);
-                $cs = User::where(['role_id'=>2])->first();
-                $inv_nmbr ='MNP_INV_'.time();
-
-                $data = array();
-                $order_info = new Order;
-                $get_order = $order_info->fetch_orders_by_id($order_id);
-                foreach($get_order as $ord){
-                    $customer_email = $ord->email;
-                    $ord->invoice_number = $inv_nmbr;
-                    $ord->products = $order_info->fetch_orderitems_with_quantity($order_id);
-                    $data = $ord;
-
-                    $invoice = Invoice::create(['invoice_number'=>$inv_nmbr, 'order_id'=>$order_id, 'customer_id'=>$ord->user_id, 'invoice_status'=>1]);
-                }
-        
-                $mail = Mail::to($customer_email)->bcc($cs->email)->bcc($driver->email)->send(new Emailsend($data));
-                //$mail = Mail::to("aizaz.hussain@orangeroomdigital.com")->bcc("aizazkalwar46@gmail.com")->bcc("muhammad.idrees@orangeroomdigital.com")->send(new Emailsend($data));
 
             }
 
@@ -441,13 +414,6 @@ class OrderController extends Controller
                 foreach($order_items as $item){
                     $gross += $item->product_price*$item->product_quantity;
                     if($item->order_item_id == $order_item_id){
-                        $stock = Stock::where(['product_id'=>$product_id])->first();
-                            if($stock){
-                                $item->stock = $stock->stock;
-                            }
-                            else{
-                                $item->stock = 'Stock does not exist';
-                            }
                         $items_arr = $item;
                     }
                 }
@@ -458,20 +424,6 @@ class OrderController extends Controller
                     $orders = $order->fetch_orders_by_id($order_id);  
                     foreach($orders as $ord){
                         $ord->products = $items_arr;
-
-                        /*foreach($ord->products as $ord_items){
-                            $stock = Stock::where(['product_id'=>$ord_items->id])->first();
-                            if($stock){
-                                $ord_items->stock = $stock->stock;
-                            }
-                            else{
-                                $ord_items->stock = 'Stock does not exists';
-                            }
-                           
-                        }*/
-
-
-
                     }
                 }
 
@@ -499,30 +451,8 @@ class OrderController extends Controller
         }
         return response($arr);
     }
-    
+
     public function send_email(){
-
-        /*$order_id = 11;
-        $driver_id = 7;
-        $driver = User::find($driver_id);
-        $cs = User::where(['role_id'=>2])->first();
-        $inv_nmbr ='MNP_INV_'.time();
-        $data = array();
-        $order_info = new Order;
-        $get_order = $order_info->fetch_orders_by_id($order_id);
-        foreach($get_order as $ord){
-            $customer_email = $ord->email;
-            $ord->invoice_number = $inv_nmbr;
-            $ord->products = $order_info->fetch_orderitems_with_quantity($order_id);
-            $data["order"] = $ord;
-
-            $invoice = Invoice::create(['invoice_number'=>$inv_nmbr, 'order_id'=>$order_id, 'customer_id'=>$ord->user_id, 'invoice_status'=>1]);
-        }*/
- 
-        //$mail = Mail::to($customer_email)->bcc($cs->email)->bcc($driver->email)->send(new Emailsend($data));
-        //$mail = Mail::to("aizaz.hussain@orangeroomdigital.com")->send(new Emailsend($data));
-        return view('invoice', $data);
-
+        return view('emailtemplate');
     }
-
 }

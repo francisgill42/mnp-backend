@@ -18,3 +18,5 @@ Route::post('/add-product', 'ProductController@add_product');
     return view('update_req');
 });
 Route::post('request_update', 'MaintenanceUserController@request_update');*/
+
+Route::get('/emailtemplate', 'OrderController@send_email');
