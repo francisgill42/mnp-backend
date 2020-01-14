@@ -458,20 +458,6 @@ class OrderController extends Controller
                     $orders = $order->fetch_orders_by_id($order_id);  
                     foreach($orders as $ord){
                         $ord->products = $items_arr;
-
-                        /*foreach($ord->products as $ord_items){
-                            $stock = Stock::where(['product_id'=>$ord_items->id])->first();
-                            if($stock){
-                                $ord_items->stock = $stock->stock;
-                            }
-                            else{
-                                $ord_items->stock = 'Stock does not exists';
-                            }
-                           
-                        }*/
-
-
-
                     }
                 }
 
@@ -483,6 +469,51 @@ class OrderController extends Controller
                 $res = false;
             }
         return response(['response_status'=>$res, 'message'=>$msg, 'updated_record'=>$ord]);
+    }
+
+    public function add_order_item(Request $request)
+    {
+        $order_id = $request->order_id;
+        $product_id = $request->product_id;
+        $item_quantity = $request->item_quantity;
+        $arr = array();
+        $gross = 0;
+            $insert = Order_item::create(['order_id'=>$order_id,'product_id'=>$product_id, 'product_quantity'=> $item_quantity]);
+            if($insert){
+                $order_item_id = $insert->id;
+                $order = new Order;
+                $order_items = $order->fetch_orderitems_with_quantity($order_id);
+                foreach($order_items as $item){
+                    $gross += $item->product_price*$item->product_quantity;
+                    if($item->order_item_id == $order_item_id){
+                        $stock = Stock::where(['product_id'=>$product_id])->first();
+                            if($stock){
+                                $item->stock = $stock->stock;
+                            }
+                            else{
+                                $item->stock = 'Stock does not exist';
+                            }
+                        $items_arr = $item;
+                    }
+                }
+                $tax = ($gross/100)*5;
+                $total = $gross+$tax;
+                $update = Order::where('id', $order_id)->update(['order_total'=>$total, 'order_tax'=>$tax, 'order_gross'=>$gross]);
+                if($update){
+                    $orders = $order->fetch_orders_by_id($order_id);  
+                    foreach($orders as $ord){
+                        $ord->products = $items_arr;
+                    }
+                }
+
+                $msg = "Order Item Added Successfully";
+                $res = true;
+            }
+            else{
+                $msg = "Order Item not Added. Try Again";
+                $res = false;
+            }
+        return response(['response_status'=>$res, 'message'=>$msg, 'new_record'=>$ord]);
     }
 
     public function select_drivers(){
