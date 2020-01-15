@@ -26,12 +26,16 @@ class OrderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        $per_page = $request->per_page;
+        $order_by = $request->order_by;
+        $sort_by = $request->sort_by;
+
         $order = new Order;
         $orders_arr = array();
         $options = array();
-        $orders = $order->fetch_orders_with_customer_and_status();
+        $orders = $order->fetch_orders_with_customer_and_status($per_page, $order_by, $sort_by);
         $opt = $orders->getOptions();
         $options['current_page'] = $orders->currentPage();
         $options['total'] = $orders->total();
