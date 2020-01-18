@@ -23,7 +23,7 @@ public function store(Request $request)
 {
 // return $request->all();
 $validator = Validator::make($request->all(), [ 
-'email' => 'required|email|unique:users', 
+'email' => 'email|unique:users', 
 'password' => 'min:6', 
 ]); 
 if ($validator->fails()) { 

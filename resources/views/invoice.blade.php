@@ -124,7 +124,7 @@
                                 <p style="text-transform:lowercase ; text-transform:capitalize; font-size: 14px; margin-bottom: 0;line-height: 20px; margin-top: 0;padding-left:10px;">(MÖVENPICK Ice Cream)</p>
                                 <p style="text-transform:lowercase ; text-transform:capitalize; font-size: 14px; margin-bottom: 0;line-height: 20px; margin-top: 0;padding-left:10px;">Dubai, U.A.E.</p>
                                 <p style="text-transform:lowercase ; text-transform:capitalize; font-size: 14px; margin-bottom: 0;line-height: 20px; margin-top: 0;padding-left:10px;">P.O. Box #: 232180</p>
-                                <p style="text-transform:lowercase ; text-transform:capitalize; font-size: 14px; margin-bottom: 0;line-height: 20px; margin-top: 0;padding-left:10px;">TRN: 100375833900003</p>
+                                <p style="text-transform:lowercase ; text-transform:capitalize; font-size: 14px; margin-bottom: 0;line-height: 20px; margin-top: 0;padding-left:10px;">VAT #: <?php echo $order->ntn; ?></p>
                             </td>
                             <td>
                                 <h3 style="padding:0;margin:0; text-align:left;padding-left:15px;">Bank Account Details</h3>
@@ -163,8 +163,11 @@
                     <table>
                         <tr>
                             <td style="width:50%;"> 
-                                Invoice #:<?php echo $order->invoice_number; ?><br>
-                                Created: <?php echo date("d-m-Y", strtotime($order->created_at)); ?><br>
+                            <strong>Invoice #:</strong><?php echo $order->invoice_number; ?><br>
+                            <strong>Delivery Date:</strong> <?php echo date('F d, Y',strtotime($order->delivery_date)); ?><br>
+                            <?php if(isset($order->payment_due_date)){ ?>
+                            <strong>Payment Due Date:</strong> <?php echo date('F d, Y',strtotime($order->payment_due_date)); ?>
+                            <?php } ?>
                             </td>
                             <td> 
                                  
@@ -172,13 +175,17 @@
                                    
                                     <table style="text-align:left;text-transform:lowercase ; text-transform:capitalize; font-size: 14px; margin-bottom: 0;line-height: 12px; margin-top: 0;padding-left:10px;text-align: left;">
                                             <tr style="text-transform:lowercase ; text-transform:capitalize; font-size: 14px; margin-bottom: 0;line-height: 20px; margin-top: 0;padding-left:10px;text-align: left;">
-                                                <td style="text-align: left; padding-bottom:3px;"><strong>Customer:</strong></td>
-                                                <td style="text-align: left; padding-bottom:3px;"><?php echo $order->name ?></td>
+                                                <td style="text-align: left; padding-bottom:3px;"><strong>Company:</strong></td>
+                                                <td style="text-align: left; padding-bottom:3px;"><?php echo $order->company_name ?></td>
                                             </tr>
-                                            <!--<tr>
-                                                <td style="text-align: left; padding-bottom:3px;"><strong>Name: </strong></td>
-                                                <td style="text-align: left; padding-bottom:3px;">Shella</td>
-                                            </tr>-->
+                                            <tr>
+                                                <td style="text-align: left; padding-bottom:3px;"><strong>Trade Name: </strong></td>
+                                                <td style="text-align: left; padding-bottom:3px;"><?php echo $order->trade_name ?></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="text-align: left; padding-bottom:3px;"><strong>Contact Person: </strong></td>
+                                                <td style="text-align: left; padding-bottom:3px;"><?php echo $order->contact_person_name ?></td>
+                                            </tr>
                                             <tr>
                                                 <td style="text-align: left; padding-bottom:3px;"><strong>Phone:</strong></td>
                                                 <td style="text-align: left; padding-bottom:3px;"><?php echo $order->mobile_number ?></td>
@@ -291,16 +298,18 @@
                 <td colspan="3"></td>
                 
                 <td colspan="3" style="font-weight:bold;border-top: 2px solid #eee;">
-                   Tax Amount: AED <?php echo $order->order_tax; ?>
+                   VAT: AED <?php echo $order->order_tax; ?>
                 </td>
             </tr>
+            <?php if($order->discounted_price){ ?>
             <tr class="total" style="text-align:right;">
                 <td colspan="3"></td>
                 
                 <td colspan="3" style="font-weight:bold;border-top: 2px solid #eee;">
-                   Discounted Price: AED <?php echo $order->discounted_price?$order->discounted_price:'0.00'; ?>
+                   Discount: AED <?php echo $order->discounted_price; ?>
                 </td>
             </tr>
+            <?php } ?>
             <tr class="total" style="text-align:right;">
                 <td colspan="3"></td>
                 
@@ -309,7 +318,8 @@
                 </td>
             </tr>
         </table>
-        Note: This is computer generated invoice no need to sign.
+        Note: This is computer generated invoice no need to sign or stamp.<br />
+        Thank you for your business.
         <div style="font-size: 10px; text-align: center; padding-top: 20px; border-top:1px solid #000;">United Cool General Trading LLC, Dubai - UAE, P.O. Box 232180, Paid Up Capital AED 300,000.00, Tax Reg. Number 100375833900003</div>
     </div>
 

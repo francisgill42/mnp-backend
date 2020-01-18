@@ -37,7 +37,7 @@ class Customer extends Authenticatable
     }
     protected $fillable = [
         'name', 'email', 'password','master','role_id','ntn','customer_category_id',
-        'group','phone_number','mobile_number','address','state_id','city_id','IsActive'
+        'group','phone_number','mobile_number','address','state_id','city_id','IsActive', 'company_name', 'trade_name', 'contact_person_name', 'delivery_from', 'delivery_to', 'payment_type'
     ];
 
     /**

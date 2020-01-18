@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use DB;
 class Maintenanceuser extends Model
 {
-    protected $fillable = ['customer_id', 'type', 'message', 'image', 'status'];
+    protected $fillable = ['customer_id', 'type', 'message', 'image', 'status', 'schedule'];
 
     public function get_all_requests(){
         $requests = DB::table('maintenanceusers')

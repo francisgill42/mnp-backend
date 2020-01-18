@@ -78,14 +78,23 @@ class MaintenanceUserController extends Controller
     {
         $request_id = $request->request_id;
         $status_id = $request->status_id;
+        $scheduling = $request->scheduling;
         $arr = array();
-        
-            $update = Maintenanceuser::where('id', $request_id)->update(['status'=>$status_id]);
+
+            if(isset($scheduling)){
+                $status_id = 2;
+                $update = Maintenanceuser::where('id', $request_id)->update(['status'=>$status_id, 'schedule'=>$scheduling]);
+            }
+            else{
+                $update = Maintenanceuser::where('id', $request_id)->update(['status'=>$status_id]);
+            }
             
             if($update){
+                $req = Maintenanceuser::find($request_id);
                 $status = Status::find($status_id);
-                $arr['id'] = $status->id;
+                $arr['status_id'] = $status->id;
                 $arr['status'] = $status->status;
+                $arr['request'] = $req;
                 $res = true;
                 $msg = "Status Changed Successfully";
             }

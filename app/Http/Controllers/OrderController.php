@@ -188,6 +188,8 @@ class OrderController extends Controller
         $order_id = $request->order_id;
         $status_id = $request->status_id;
         $driver_id = $request->driver_id;
+        $scheduling = $request->scheduling;
+        $due_date = $request->payment_due_date;
         $arr = array();
         $flag = false;
         $stock_status = false;
@@ -241,7 +243,6 @@ class OrderController extends Controller
                     }
                 }
 
-                $driver = User::find($driver_id);
                 $cs = User::where(['role_id'=>2])->first();
                 $inv_nmbr ='MNP_INV_'.time();
 
@@ -257,14 +258,14 @@ class OrderController extends Controller
                     $invoice = Invoice::create(['invoice_number'=>$inv_nmbr, 'order_id'=>$order_id, 'customer_id'=>$ord->user_id, 'invoice_status'=>1]);
                 }
         
-                $mail = Mail::to($customer_email)->bcc($cs->email)->bcc($driver->email)->send(new Emailsend($data));
+                $mail = Mail::to($customer_email)->bcc($cs->email)->send(new Emailsend($data));
                 //$mail = Mail::to("aizaz.hussain@orangeroomdigital.com")->bcc("aizazkalwar46@gmail.com")->bcc("muhammad.idrees@orangeroomdigital.com")->send(new Emailsend($data));
 
             }
 
             $date = date("d-m-Y", strtotime(NOW()));
             if($status_id == 2){
-                $update = Order::where('id', $order_id)->update(['order_status_id'=>$status_id, 'order_confirmed_date'=>$date]);
+                $update = Order::where('id', $order_id)->update(['order_status_id'=>$status_id, 'order_confirmed_date'=>$date, 'delivery_date'=>$scheduling, 'payment_due_date'=>$due_date]);
             }
             else if($status_id == 3){
                 $update = Order::where('id', $order_id)->update(['order_status_id'=>$status_id, 'order_shipped_date'=>$date]);

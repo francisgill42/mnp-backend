@@ -53,7 +53,6 @@ return response()->json([
 
 }
 
-
 $arr = [
 'address' => $request->address,
 'city_id' => $request->city_id,
@@ -66,6 +65,12 @@ $arr = [
 'phone_number' => $request->phone_number,
 'state_id' => $request->state_id,
 'IsActive' => $request->IsActive,
+'company_name' => $request->company_name,
+'trade_name' => $request->trade_name,
+'contact_person_name' => $request->contact_person_name,
+'delivery_from' => $request->delivery_from,
+'delivery_to' => $request->delivery_to,
+'payment_type' => $request->payment_type,
 'master' => 0,
 'role_id' => 1
 ];
