@@ -15,6 +15,8 @@ use App\Assign;
 use App\Stock;
 use App\User;
 use App\Invoice;
+use App\Exports\UsersExport;
+use Maatwebsite\Excel\Facades\Excel;
 class OrderController extends Controller
 {
     public function __construct()
@@ -31,11 +33,24 @@ class OrderController extends Controller
         $per_page = $request->per_page;
         $order_by = $request->order_by;
         $sort_by = $request->sort_by;
+        $timestamp = $request->timestamp;
+        $driver = $request->driver;
+        $status = $request->status;
+        $customer = $request->customer;
+        $from = $request->from;
+        $to = $request->to;
+        $state = $request->state;
+        $city = $request->city;
 
         $order = new Order;
         $orders_arr = array();
         $options = array();
-        $orders = $order->fetch_orders_with_customer_and_status($per_page, $order_by, $sort_by);
+        if(empty($driver)){
+            $orders = $order->fetch_orders_with_customer_and_status($per_page,$order_by,$sort_by,$timestamp,$status,$customer,$from,$to,$state,$city);
+        }
+        else{
+            $orders = $order->fetch_orders_with_driver_and_status($per_page,$order_by,$sort_by,$timestamp,$driver,$status,$customer,$from,$to,$state,$city);
+        }
         $opt = $orders->getOptions();
         $options['current_page'] = $orders->currentPage();
         $options['total'] = $orders->total();
@@ -49,6 +64,7 @@ class OrderController extends Controller
         $options['previous_page_url'] = $orders->previousPageUrl();
         
         foreach($orders as $ord){
+            $ord->driver = $order->fetch_assigned_driver_to_order($ord->id);
             $ord->products = $order->fetch_orderitems_with_quantity($ord->id);
             foreach($ord->products as $ord_items){
                 $stock = Stock::where(['product_id'=>$ord_items->id])->first();
@@ -559,6 +575,92 @@ class OrderController extends Controller
         //$mail = Mail::to("aizaz.hussain@orangeroomdigital.com")->send(new Emailsend($data));
         //return view('invoice', $data);
 
+    }
+    public function daily_orders(){
+        $orders = new Order;
+        $todays = $orders->order_by_today();
+        $data = array();
+        $data['orders_count'] = count($todays);
+        $amount = 0;
+        foreach($todays as $ord){
+            $amount += $ord->order_total;
+        }
+        $data['orders_amount'] = $amount;
+
+        return response($data);
+    }
+    public function weekly_orders(){
+		$orders = new Order;
+        $todays = $orders->order_by_week();
+        $data = array();
+        $data['orders_count'] = count($todays);
+        $amount = 0;
+        foreach($todays as $ord){
+            $amount += $ord->order_total;
+        }
+        $data['orders_amount'] = $amount;
+
+        return response($data);
+    }
+    public function monthly_orders(){
+		$orders = new Order;
+        $todays = $orders->order_by_month();
+        $data = array();
+        $data['orders_count'] = count($todays);
+        $amount = 0;
+        foreach($todays as $ord){
+            $amount += $ord->order_total;
+        }
+        $data['orders_amount'] = $amount;
+
+        return response($data);
+    }
+    public function export() 
+    {
+        return Excel::download(new UsersExport, 'users.xlsx');
+    }
+    public function export_orders(Request $request)
+    {
+        $order_by = $request->order_by;
+        $sort_by = $request->sort_by;
+        $timestamp = $request->timestamp;
+        $driver = $request->driver;
+        $status = $request->status;
+        $customer = $request->customer;
+        $from = $request->from;
+        $to = $request->to;
+        $state = $request->state;
+        $city = $request->city;
+
+        $order = new Order;
+        $orders_arr = array();
+        $options = array();
+        if(empty($driver)){
+            $orders = $order->export_orders_with_customer_and_status($order_by,$sort_by,$timestamp,$status,$customer,$from,$to,$state,$city);
+        }
+        else{
+            $orders = $order->export_orders_with_driver_and_status($order_by,$sort_by,$timestamp,$driver,$status,$customer,$from,$to,$state,$city);
+        }
+        
+        foreach($orders as $ord){
+            $ord->driver = $order->fetch_assigned_driver_to_order($ord->id);
+            $ord->products = $order->fetch_orderitems_with_quantity($ord->id);
+            foreach($ord->products as $ord_items){
+                $stock = Stock::where(['product_id'=>$ord_items->id])->first();
+                if($stock){
+                    $ord_items->stock = $stock->stock;
+                }
+                else{
+                    $ord_items->stock = 'Stock does not exist';
+                }
+               
+            }
+            $orders_arr[] = $ord;
+        }
+        //dump($ord->products);
+        $options['orders'] = $orders_arr;
+        return response()->json($options, 200);
+        
     }
 
 }

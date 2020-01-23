@@ -25,6 +25,7 @@ Route::post('update_password/{id}', 'CustomerController@update_password');
 Route::resource('customer_group', 'CustomerCategoryController');
 Route::resource('role', 'RoleController');
 Route::resource('state', 'StateController');
+Route::resource('city', 'CityController');
 Route::resource('status', 'StatusController');
 Route::resource('category', 'CategoryController');
 
@@ -51,6 +52,7 @@ Route::get('delivered_orders_by_driver', 'OrderController@get_delivered_orders_b
 
 
 Route::resource('stock', 'StockController');
+Route::resource('stock_adjustment', 'StockAdjController');
 
 Route::resource('discount', 'DiscountController');
 Route::post('update_discount', 'DiscountController@update_discount');
@@ -60,3 +62,10 @@ Route::post('request_status_change', 'MaintenanceUserController@request_status_c
 Route::post('request_update', 'MaintenanceUserController@request_update');
 
 Route::get('counters', 'AdminController@counters');
+
+Route::get('daily_orders', 'OrderController@daily_orders');
+Route::get('weekly_orders', 'OrderController@weekly_orders');
+Route::get('monthly_orders', 'OrderController@monthly_orders');
+
+Route::get('/export', 'OrderController@export');
+Route::get('/export_orders', 'OrderController@export_orders');

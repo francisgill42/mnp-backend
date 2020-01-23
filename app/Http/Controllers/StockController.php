@@ -7,15 +7,25 @@ use App\Stock;
 use App\Product;
 class StockController extends Controller
 {
-    public function index()
+    public function __construct()
     {
-        $data = array();
-        $stocks = Stock::orderBy('id', 'desc')->get();
-        foreach($stocks as $stock){
-            $stock->product = Product::find($stock->product_id);
-            $data[] = $stock;
-        }
-        return response($data);
+    $this->middleware('auth:api');
+    }
+    public function index(Request $request)
+    {
+        $from = $request->from;
+        $to = $request->to;
+        $product = $request->product;
+
+        $stock = new Stock;
+        return $stock->get_stock_with_product($from, $to, $product);
+        // $data = array();
+        // $stocks = Stock::orderBy('id', 'desc')->get();
+        // foreach($stocks as $stock){
+        //     $stock->product = Product::find($stock->product_id);
+        //     $data[] = $stock;
+        // }
+        // return response($data);
     }
 
     public function store(Request $request)

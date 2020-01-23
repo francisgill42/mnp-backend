@@ -9,11 +9,13 @@ use App\Order;
 use App\Product;
 use Illuminate\Support\Facades\Auth;
 use Validator;
+use App\Exports\UsersExport;
+use Maatwebsite\Excel\Facades\Excel;
 class AdminController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api')->except('register','login','logout');
+        $this->middleware('auth:api')->except('register','login','logout','export');
 	}
 
 
@@ -50,4 +52,8 @@ class AdminController extends Controller
 
 		return response($count);
 	}
+	// public function export() 
+    // {
+    //     return Excel::download(new UsersExport, 'orders.xlsx');
+    // }
 }

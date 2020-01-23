@@ -16,7 +16,17 @@ class AuthController extends Controller
 
 public function login(Request $request){ 
 
-if(Auth::attempt(['email' => $request->email, 'password' => $request->password, 'master' => 0])){ 
+	if(filter_var($request->email, FILTER_VALIDATE_EMAIL)) {
+		//user sent their email 
+		$auth = Auth::attempt(['email' => $request->email, 'password' => $request->password, 'master' => 0]);
+	} else {
+		//they sent their username instead 
+		$auth = Auth::attempt(['name' => $request->email, 'password' => $request->password, 'master' => 0]);
+	}
+
+
+//if(Auth::attempt(['email' => $request->email, 'password' => $request->password, 'master' => 0])){ 
+	if($auth){ 
 		$user = Auth::user(); 
 		if($user->IsActive == 1){
 

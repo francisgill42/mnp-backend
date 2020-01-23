@@ -123,7 +123,7 @@ return response()->json([
 
 $arr = [
     'address' => $request->address,
-    'city_id' => $request->cities_by_state_id,
+    'city_id' => $request->cities_id,
     'customer_category_id' => $request->customer_category_id,
     'email' => $request->email,
     'mobile_number' => $request->mobile_number,
@@ -131,15 +131,22 @@ $arr = [
     'ntn' => $request->ntn,
     'phone_number' => $request->phone_number,
     'IsActive' => $request->IsActive,
+    'company_name' => $request->company_name,
+'trade_name' => $request->trade_name,
+'contact_person_name' => $request->contact_person_name,
+'delivery_from' => $request->delivery_from,
+'delivery_to' => $request->delivery_to,
+'payment_type' => $request->payment_type,
     'state_id' => $request->state_id,
     
 ];
+
 
 $updated = \DB::table('users')->where('id',$id)->update($arr);
 
 
 
-if ($updated) {
+if($updated) {
 
 $user =  \DB::table('users')
 ->join('customer_categories', 'users.customer_category_id', '=', 'customer_categories.id')

@@ -12,7 +12,13 @@ class MaintenanceUserController extends Controller
     {
         $this->middleware('auth:api');
     }
-    public function index(){
+    public function index(Request $request){
+
+        $from = $request->from;
+        $to = $request->to;
+        $status = $request->status;
+        $customer = $request->customer;
+
         $customer_id = Auth::user()->id;
         $role_id = Auth::user()->role_id;
         $arr = array();
@@ -24,7 +30,7 @@ class MaintenanceUserController extends Controller
             $get_requests = $requests->get_all_requests_by_maintenanceuser();
         }
         else{
-            $get_requests = $requests->get_all_requests();
+            $get_requests = $requests->get_all_requests($from, $to, $status, $customer);
         }
 
         foreach($get_requests as $request){

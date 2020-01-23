@@ -20,3 +20,4 @@ Route::post('/add-product', 'ProductController@add_product');
 Route::post('request_update', 'MaintenanceUserController@request_update');*/
 
 Route::get('/emailtemplate', 'OrderController@send_email');
+Route::get('/export', 'OrderController@export');
