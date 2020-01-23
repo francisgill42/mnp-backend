@@ -11,11 +11,12 @@ class Order extends Model
     public function fetch_orders_with_customer_and_status($per_page,$order_by,$sort_by,$timestamp,$status,$customer,$from,$to,$state,$city){ 
         
         $args = array();
-        $now = date('Y-m-d');
+        $now = date('Y-m-d', strtotime('+1 day'));
         $bw = array('', $now);
         if($timestamp){
             if($timestamp == 'today'){
-                $args[] = array('orders.created_at', '=', $now);
+                $today = date('Y-m-d', strtotime('-1 day'));
+                $args[] = array('orders.created_at', '>', $today);
             }
             else if($timestamp == 'week'){
                 $week = date('Y-m-d', strtotime('-1 week'));
@@ -65,11 +66,12 @@ class Order extends Model
     public function fetch_orders_with_driver_and_status($per_page,$order_by,$sort_by,$timestamp,$driver,$status,$customer,$from,$to,$state,$city){ 
         
         $args = array();
-        $now = date('Y-m-d');
+        $now = date('Y-m-d', strtotime('+1 day'));
         $bw = array('', $now);
         if($timestamp){
             if($timestamp == 'today'){
-                $args[] = array('orders.created_at', '=', $now);
+                $today = date('Y-m-d', strtotime('-1 day'));
+                $args[] = array('orders.created_at', '>', $today);
             }
             else if($timestamp == 'week'){
                 $week = date('Y-m-d', strtotime('-1 week'));
@@ -102,8 +104,8 @@ class Order extends Model
         }
         if($city){
            $args[] = array('users.city_id', '=', $city);
-       }
-       
+        }
+               
         $orders = DB::table('orders')
             ->join('users', 'orders.customer_id', '=', 'users.id')
             ->join('customer_categories', 'users.customer_category_id', '=', 'customer_categories.id')
@@ -119,6 +121,83 @@ class Order extends Model
 
             return $orders;
 
+    }
+    public function get_orders_with_products($per_page,$order_by,$sort_by,$timestamp,$driver,$status,$customer,$from,$to,$state,$city,$product){
+        
+        $args = array();
+        $now = date('Y-m-d', strtotime('+1 day'));
+        $bw = array('', $now);
+        if($timestamp){
+            if($timestamp == 'today'){
+                $today = date('Y-m-d', strtotime('-1 day'));
+                $args[] = array('orders.created_at', '>', $today);
+            }
+            else if($timestamp == 'week'){
+                $week = date('Y-m-d', strtotime('-1 week'));
+                $args[] = array('orders.created_at', '>=', $week);
+            }
+            else if($timestamp == 'month'){
+                $month = date('Y-m-d', strtotime('-1 month'));
+                $args[] = array('orders.created_at', '>=', $month); 
+            }
+            else if ($timestamp == 'year'){
+                $year = date('Y-m-d', strtotime('-1 year'));
+                $args[] = array('orders.created_at', '>=', $year); 
+            }
+        }
+        else if($from && $to){
+            $bw = array($from, $to);
+        }
+         
+         if($status){
+            $args[] = array('orders.order_status_id', '=', $status); 
+         }         
+         if($customer){
+            $args[] = array('orders.customer_id', '=', $customer);
+         }
+         if($state){
+            $args[] = array('users.state_id', '=', $state);
+        }
+        if($city){
+           $args[] = array('users.city_id', '=', $city);
+        }
+        if($product){
+            $args[] = array('order_items.product_id', '=', $product);
+         }
+
+         if($driver){
+            $args[] = array('assigns.driver_id', '=', $driver);
+            $orders = DB::table('orders')
+            ->join('users', 'orders.customer_id', '=', 'users.id')
+            ->join('customer_categories', 'users.customer_category_id', '=', 'customer_categories.id')
+            ->join('states', 'users.state_id', '=', 'states.id')
+            ->join('cities', 'users.city_id', '=', 'cities.id')
+            ->join('statuses', 'orders.order_status_id', '=', 'statuses.id')
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->join('assigns', 'orders.id', '=', 'assigns.order_id')
+            ->select('orders.*', 'statuses.status', 'users.id as user_id', 'users.name', 'users.role_id', 'users.customer_category_id', 'users.master', 'users.email', 'users.phone_number', 'users.mobile_number', 'users.ntn', 'users.address', 'users.state_id', 'users.city_id', 'users.IsActive', 'users.company_name', 'users.trade_name', 'users.contact_person_name', 'users.payment_type', 'users.delivery_from', 'users.delivery_to', 'customer_categories.customer_category_name', 'states.state_name', 'cities.city_name')
+            ->where($args)
+            ->whereBetween('orders.created_at', $bw)
+            ->orderBy($order_by, $sort_by)
+            ->paginate($per_page);
+         }
+         else{
+            $orders = DB::table('orders')
+            ->join('users', 'orders.customer_id', '=', 'users.id')
+            ->join('customer_categories', 'users.customer_category_id', '=', 'customer_categories.id')
+            ->join('states', 'users.state_id', '=', 'states.id')
+            ->join('cities', 'users.city_id', '=', 'cities.id')
+            ->join('statuses', 'orders.order_status_id', '=', 'statuses.id')
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->select('orders.*', 'statuses.status', 'users.id as user_id', 'users.name', 'users.role_id', 'users.customer_category_id', 'users.master', 'users.email', 'users.phone_number', 'users.mobile_number', 'users.ntn', 'users.address', 'users.state_id', 'users.city_id', 'users.IsActive', 'users.company_name', 'users.trade_name', 'users.contact_person_name', 'users.payment_type', 'users.delivery_from', 'users.delivery_to', 'customer_categories.customer_category_name', 'states.state_name', 'cities.city_name')
+            ->where($args)
+            ->whereBetween('orders.created_at', $bw)
+            ->orderBy($order_by, $sort_by)
+            ->paginate($per_page);
+         }
+        return $orders;
     }
 
     public function fetch_orders_by_id($order_id){
@@ -265,11 +344,12 @@ class Order extends Model
     public function export_orders_with_customer_and_status($order_by,$sort_by,$timestamp,$status,$customer,$from,$to,$state,$city){ 
         
         $args = array();
-        $now = date('Y-m-d');
+        $now = date('Y-m-d', strtotime('+1 day'));
         $bw = array('', $now);
         if($timestamp){
             if($timestamp == 'today'){
-                $args[] = array('orders.created_at', '=', $now);
+                $today = date('Y-m-d', strtotime('-1 day'));
+                $args[] = array('orders.created_at', '>', $today);
             }
             else if($timestamp == 'week'){
                 $week = date('Y-m-d', strtotime('-1 week'));
@@ -319,11 +399,12 @@ class Order extends Model
     public function export_orders_with_driver_and_status($order_by,$sort_by,$timestamp,$driver,$status,$customer,$from,$to,$state,$city){ 
         
         $args = array();
-        $now = date('Y-m-d');
+        $now = date('Y-m-d', strtotime('+1 day'));
         $bw = array('', $now);
         if($timestamp){
             if($timestamp == 'today'){
-                $args[] = array('orders.created_at', '=', $now);
+                $today = date('Y-m-d', strtotime('-1 day'));
+                $args[] = array('orders.created_at', '>', $today);
             }
             else if($timestamp == 'week'){
                 $week = date('Y-m-d', strtotime('-1 week'));
@@ -356,8 +437,8 @@ class Order extends Model
         }
         if($city){
            $args[] = array('users.city_id', '=', $city);
-       }
-       
+        }
+               
         $orders = DB::table('orders')
             ->join('users', 'orders.customer_id', '=', 'users.id')
             ->join('customer_categories', 'users.customer_category_id', '=', 'customer_categories.id')
@@ -374,9 +455,98 @@ class Order extends Model
             return $orders;
 
     }
+    public function export_orders_with_products($order_by,$sort_by,$timestamp,$driver,$status,$customer,$from,$to,$state,$city,$product){
+        
+        $args = array();
+        $now = date('Y-m-d', strtotime('+1 day'));
+        $bw = array('', $now);
+        if($timestamp){
+            if($timestamp == 'today'){
+                $today = date('Y-m-d', strtotime('-1 day'));
+                $args[] = array('orders.created_at', '>', $today);
+            }
+            else if($timestamp == 'week'){
+                $week = date('Y-m-d', strtotime('-1 week'));
+                $args[] = array('orders.created_at', '>=', $week);
+            }
+            else if($timestamp == 'month'){
+                $month = date('Y-m-d', strtotime('-1 month'));
+                $args[] = array('orders.created_at', '>=', $month); 
+            }
+            else if ($timestamp == 'year'){
+                $year = date('Y-m-d', strtotime('-1 year'));
+                $args[] = array('orders.created_at', '>=', $year); 
+            }
+        }
+        else if($from && $to){
+            $bw = array($from, $to);
+        }
+         
+         if($status){
+            $args[] = array('orders.order_status_id', '=', $status); 
+         }         
+         if($customer){
+            $args[] = array('orders.customer_id', '=', $customer);
+         }
+         if($state){
+            $args[] = array('users.state_id', '=', $state);
+        }
+        if($city){
+           $args[] = array('users.city_id', '=', $city);
+        }
+        if($product){
+            $args[] = array('order_items.product_id', '=', $product);
+         }
 
+         if($driver){
+            $args[] = array('assigns.driver_id', '=', $driver);
+            $orders = DB::table('orders')
+            ->join('users', 'orders.customer_id', '=', 'users.id')
+            ->join('customer_categories', 'users.customer_category_id', '=', 'customer_categories.id')
+            ->join('states', 'users.state_id', '=', 'states.id')
+            ->join('cities', 'users.city_id', '=', 'cities.id')
+            ->join('statuses', 'orders.order_status_id', '=', 'statuses.id')
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->join('assigns', 'orders.id', '=', 'assigns.order_id')
+            ->select('orders.*', 'statuses.status', 'users.id as user_id', 'users.name', 'users.role_id', 'users.customer_category_id', 'users.master', 'users.email', 'users.phone_number', 'users.mobile_number', 'users.ntn', 'users.address', 'users.state_id', 'users.city_id', 'users.IsActive', 'users.company_name', 'users.trade_name', 'users.contact_person_name', 'users.payment_type', 'users.delivery_from', 'users.delivery_to', 'customer_categories.customer_category_name', 'states.state_name', 'cities.city_name')
+            ->where($args)
+            ->whereBetween('orders.created_at', $bw)
+            ->orderBy($order_by, $sort_by)
+            ->get();
+         }
+         else{
+            $orders = DB::table('orders')
+            ->join('users', 'orders.customer_id', '=', 'users.id')
+            ->join('customer_categories', 'users.customer_category_id', '=', 'customer_categories.id')
+            ->join('states', 'users.state_id', '=', 'states.id')
+            ->join('cities', 'users.city_id', '=', 'cities.id')
+            ->join('statuses', 'orders.order_status_id', '=', 'statuses.id')
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->select('orders.*', 'statuses.status', 'users.id as user_id', 'users.name', 'users.role_id', 'users.customer_category_id', 'users.master', 'users.email', 'users.phone_number', 'users.mobile_number', 'users.ntn', 'users.address', 'users.state_id', 'users.city_id', 'users.IsActive', 'users.company_name', 'users.trade_name', 'users.contact_person_name', 'users.payment_type', 'users.delivery_from', 'users.delivery_to', 'customer_categories.customer_category_name', 'states.state_name', 'cities.city_name')
+            ->where($args)
+            ->whereBetween('orders.created_at', $bw)
+            ->orderBy($order_by, $sort_by)
+            ->get();
+         }
+        return $orders;
+    }
 
+    public function recent_orders(){
+        $orders = DB::table('orders')
+        ->join('users', 'orders.customer_id', '=', 'users.id')
+        ->join('customer_categories', 'users.customer_category_id', '=', 'customer_categories.id')
+        ->join('states', 'users.state_id', '=', 'states.id')
+        ->join('cities', 'users.city_id', '=', 'cities.id')
+        ->join('statuses', 'orders.order_status_id', '=', 'statuses.id')
+        ->select('orders.*', 'statuses.status', 'users.id as user_id', 'users.name', 'users.role_id', 'users.customer_category_id', 'users.master', 'users.email', 'users.phone_number', 'users.mobile_number', 'users.ntn', 'users.address', 'users.state_id', 'users.city_id', 'users.IsActive', 'users.company_name', 'users.trade_name', 'users.contact_person_name', 'users.payment_type', 'users.delivery_from', 'users.delivery_to', 'customer_categories.customer_category_name', 'states.state_name', 'cities.city_name')
+        ->orderBy('created_at', 'desc')
+        ->limit(10)
+        ->get();
 
+        return $orders;    
+    }
 
 }
 

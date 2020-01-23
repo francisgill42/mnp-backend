@@ -41,16 +41,22 @@ class OrderController extends Controller
         $to = $request->to;
         $state = $request->state;
         $city = $request->city;
+        $product = $request->product;
 
         $order = new Order;
         $orders_arr = array();
         $options = array();
-        if(empty($driver)){
+        if(empty($driver) && empty($product)){
             $orders = $order->fetch_orders_with_customer_and_status($per_page,$order_by,$sort_by,$timestamp,$status,$customer,$from,$to,$state,$city);
         }
-        else{
+        else if($product){
+            $orders = $order->get_orders_with_products($per_page,$order_by,$sort_by,$timestamp,$driver,$status,$customer,$from,$to,$state,$city,$product);
+        }
+        else if($driver){
             $orders = $order->fetch_orders_with_driver_and_status($per_page,$order_by,$sort_by,$timestamp,$driver,$status,$customer,$from,$to,$state,$city);
         }
+        
+        
         $opt = $orders->getOptions();
         $options['current_page'] = $orders->currentPage();
         $options['total'] = $orders->total();
@@ -631,14 +637,18 @@ class OrderController extends Controller
         $to = $request->to;
         $state = $request->state;
         $city = $request->city;
+        $product = $request->product;
 
         $order = new Order;
         $orders_arr = array();
-        $options = array();
-        if(empty($driver)){
+        //$options = array();
+        if(empty($driver) && empty($product)){
             $orders = $order->export_orders_with_customer_and_status($order_by,$sort_by,$timestamp,$status,$customer,$from,$to,$state,$city);
         }
-        else{
+        else if($product){
+            $orders = $order->export_orders_with_products($order_by,$sort_by,$timestamp,$driver,$status,$customer,$from,$to,$state,$city,$product);
+        }
+        else if($driver){
             $orders = $order->export_orders_with_driver_and_status($order_by,$sort_by,$timestamp,$driver,$status,$customer,$from,$to,$state,$city);
         }
         
@@ -658,9 +668,32 @@ class OrderController extends Controller
             $orders_arr[] = $ord;
         }
         //dump($ord->products);
-        $options['orders'] = $orders_arr;
-        return response()->json($options, 200);
+        //$options['orders'] = $orders_arr;
+        return response()->json($orders_arr, 200);
         
     }
 
+    public function recent_orders(){
+        $order = new Order;
+        $orders_arr = array();
+        //$options = array();
+        $orders = $order->recent_orders();
+        foreach($orders as $ord){
+            $ord->driver = $order->fetch_assigned_driver_to_order($ord->id);
+            $ord->products = $order->fetch_orderitems_with_quantity($ord->id);
+            foreach($ord->products as $ord_items){
+                $stock = Stock::where(['product_id'=>$ord_items->id])->first();
+                if($stock){
+                    $ord_items->stock = $stock->stock;
+                }
+                else{
+                    $ord_items->stock = 'Stock does not exist';
+                }
+               
+            }
+            $orders_arr[] = $ord;
+        }
+        //$options['orders'] = $orders_arr;
+        return response()->json($orders_arr, 200);
+    }
 }

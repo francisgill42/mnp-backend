@@ -69,3 +69,4 @@ Route::get('monthly_orders', 'OrderController@monthly_orders');
 
 Route::get('/export', 'OrderController@export');
 Route::get('/export_orders', 'OrderController@export_orders');
+Route::get('/recent_orders', 'OrderController@recent_orders');
