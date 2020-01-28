@@ -11,7 +11,7 @@ class Stock extends Model
     public function get_stock_with_product($from, $to, $product)
     {
         $args = array();
-        $now = date('Y-m-d');
+        $now = date('Y-m-d', strtotime('+1 day'));
         $bw = array('', $now);
         if($from && $to){
             $bw = array($from, $to);
@@ -26,6 +26,16 @@ class Stock extends Model
             ->whereBetween('stocks.created_at', $bw)
             // ->orderBy($order_by, $sort_by)
             // ->paginate($per_page);
+            ->get();
+
+            return $stock;
+    }
+    public function get_stock_with_product_by_id($id)
+    {
+        $stock = DB::table('stocks')
+            ->join('products', 'stocks.product_id', '=', 'products.id')
+            ->select('stocks.id as stock_id', 'stocks.stock', 'stocks.created_at as stock_created', 'products.*')
+            ->where('stocks.id', '=', $id)
             ->get();
 
             return $stock;

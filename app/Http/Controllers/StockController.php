@@ -53,7 +53,8 @@ class StockController extends Controller
                 'stock' => $stock
                 ]);
                 if($pro){
-                    $pro->product = Product::find($product);
+                    $get_stock = new Stock;
+                    $pro = $get_stock->get_stock_with_product_by_id($pro->id);
                     $msg = "Stock for this Product Added Successfully";
                     $res = true;
                 }

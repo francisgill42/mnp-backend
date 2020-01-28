@@ -163,7 +163,7 @@
                     <table>
                         <tr>
                             <td style="width:50%;"> 
-                            <strong>Invoice #:</strong><?php echo $order->invoice_number; ?><br>
+                            <strong>Invoice #:</strong><?php echo $order->prefix.''.$order->invoice_number; ?><br>
                             <strong>Delivery Date:</strong> <?php echo date('F d, Y',strtotime($order->delivery_date)); ?><br>
                             <?php if(isset($order->payment_due_date)){ ?>
                             <strong>Payment Due Date:</strong> <?php echo date('F d, Y',strtotime($order->payment_due_date)); ?>

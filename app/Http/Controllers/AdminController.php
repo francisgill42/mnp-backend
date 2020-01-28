@@ -15,7 +15,7 @@ class AdminController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api')->except('register','login','logout','export');
+        $this->middleware('auth:api')->except('register','login','logout');
 	}
 
 
@@ -42,6 +42,7 @@ class AdminController extends Controller
 		} 
 	}
 	public function counters(){
+	/*------------- Counters -------------------- */	
 		$customers = User::where(['role_id'=>1])->count();
 		$orders = Order::count();
 		$products = Product::count();
@@ -50,10 +51,41 @@ class AdminController extends Controller
 		$count['orders'] = $orders;
 		$count['products'] = $products;
 
+	/*------------ Today's orders ---------------- */
+		$orders = new Order;
+        $todays = $orders->order_by_today();
+        $datadaily = array();
+        $datadaily['orders_count'] = count($todays);
+        $daily = 0;
+        foreach($todays as $orddaily){
+            $daily += $orddaily->order_total;
+        }
+		$datadaily['orders_amount'] = $daily;
+		$count['daily_orders'] = $datadaily;
+
+	/*------------ Weekly orders ---------------- */	
+		$weeks = $orders->order_by_week();
+        $dataweek = array();
+        $dataweek['orders_count'] = count($weeks);
+        $week = 0;
+        foreach($weeks as $ordweek){
+            $week += $ordweek->order_total;
+        }
+        $dataweek['orders_amount'] = $week;
+		$count['weekly_orders'] = $dataweek;
+
+	/*------------ Monthly orders ---------------- */	
+		$months = $orders->order_by_month();
+        $datamonth = array();
+        $datamonth['orders_count'] = count($months);
+        $month = 0;
+        foreach($months as $ordmonth){
+            $month += $ordmonth->order_total;
+        }
+		$datamonth['orders_amount'] = round($month);
+		$count['monthly_orders'] = $datamonth;
+		
 		return response($count);
 	}
-	// public function export() 
-    // {
-    //     return Excel::download(new UsersExport, 'orders.xlsx');
-    // }
+	
 }

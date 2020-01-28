@@ -15,6 +15,9 @@ use App\Assign;
 use App\Stock;
 use App\User;
 use App\Invoice;
+use App\Customer;
+use App\State;
+use App\City;
 use App\Exports\UsersExport;
 use Maatwebsite\Excel\Facades\Excel;
 class OrderController extends Controller
@@ -206,7 +209,7 @@ class OrderController extends Controller
      */
 
     public function status_change(Request $request)
-    {
+    {        
         $order_id = $request->order_id;
         $status_id = $request->status_id;
         $driver_id = $request->driver_id;
@@ -266,7 +269,13 @@ class OrderController extends Controller
                 }
 
                 $cs = User::where(['role_id'=>2])->first();
-                $inv_nmbr ='MNP_INV_'.time();
+                $get_inv = Invoice::orderby('id', 'desc')->first();
+                if($get_inv){
+                    $inv_nmbr = $get_inv->invoice_number+1;
+                }
+                else{
+                    $inv_nmbr ='1000000';
+                }
 
                 $data = array();
                 $order_info = new Order;
@@ -278,6 +287,8 @@ class OrderController extends Controller
                     $data = $ord;
 
                     $invoice = Invoice::create(['invoice_number'=>$inv_nmbr, 'order_id'=>$order_id, 'customer_id'=>$ord->user_id, 'invoice_status'=>1]);
+                    $get = Invoice::find($invoice->id);
+                    $ord->prefix = $get->prefix;
                 }
         
                 $mail = Mail::to($customer_email)->bcc($cs->email)->send(new Emailsend($data));
@@ -695,5 +706,25 @@ class OrderController extends Controller
         }
         //$options['orders'] = $orders_arr;
         return response()->json($orders_arr, 200);
+    }
+    public function pdf_export(){
+        echo "pdf";
+    }
+    public function filter_listing(){
+        $data = array();
+        $products = Product::select('id','product_title')->get();
+        $customers = Customer::where(['role_id'=>1])->select('id', 'company_name')->get();
+        $drivers = Driver::where(['role_id'=>3])->select('id', 'name')->get();
+        $status = Status::select('id','status')->get();
+        $states = State::select('id','state_name')->get();
+        $city = City::select('id','city_name')->get();
+
+        $data['products'] = $products;
+        $data['customers'] = $customers;
+        $data['drivers'] = $drivers;
+        $data['status'] = $status;
+        $data['states'] = $states;
+        $data['cities'] = $city;
+        return $data;
     }
 }

@@ -20,7 +20,7 @@ class Stockadj extends Model
     }
     public function get_adjustments_with_filter($from, $to, $product){
         $args = array();
-        $now = date('Y-m-d.h:i:s');
+        $now = date('Y-m-d', strtotime('+1 day'));
         $bw = array('', $now);
         if($from && $to){
             $from = date('Y-m-d.h:i:s', strtotime($from));
