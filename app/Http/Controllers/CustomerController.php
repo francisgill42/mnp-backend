@@ -149,8 +149,8 @@ $updated = \DB::table('users')->where('id',$id)->update($arr);
 if($updated) {
 
 $user =  \DB::table('users')
-->join('customer_categories', 'users.customer_category_id', '=', 'customer_categories.id')
-->join('states', 'users.state_id', '=', 'states.id')
+ ->join('customer_categories', 'users.customer_category_id', '=', 'customer_categories.id')
+ ->join('states', 'users.state_id', '=', 'states.id')
 ->join('cities', 'users.city_id', '=', 'cities.id')
 ->select(
     'users.*',

@@ -23,6 +23,7 @@ class Stockadj extends Model
         $now = date('Y-m-d', strtotime('+1 day'));
         $bw = array('', $now);
         if($from && $to){
+            $to = date('Y-m-d', strtotime($to.' +1 day'));
             $from = date('Y-m-d.h:i:s', strtotime($from));
             $to = date('Y-m-d.h:i:s', strtotime($to));
             $bw = array($from, $to);

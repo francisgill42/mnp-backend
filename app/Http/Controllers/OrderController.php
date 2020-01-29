@@ -167,12 +167,14 @@ class OrderController extends Controller
         
     }
 
-    public function search_order($q){
-    	
+    public function search_order(Request $request, $q){
+    	$per_page = $request->per_page;
+        $order_by = $request->order_by;
+        $sort_by = $request->sort_by;
     	 $order = new Order;
         $orders_arr = array();
         $options = array();
-        $orders = $order->fetch_orders_with_customer_and_status_with_search($q);
+        $orders = $order->fetch_orders_with_customer_and_status_with_search($q, $order_by, $sort_by, $per_page);
         $opt = $orders->getOptions();
         $options['current_page'] = $orders->currentPage();
         $options['total'] = $orders->total();
@@ -283,6 +285,8 @@ class OrderController extends Controller
                 foreach($get_order as $ord){
                     $customer_email = $ord->email;
                     $ord->invoice_number = $inv_nmbr;
+                    $ord->delivery_date = $scheduling;
+                    $ord->payment_due_date = $due_date;
                     $ord->products = $order_info->fetch_orderitems_with_quantity($order_id);
                     $data = $ord;
 
@@ -290,7 +294,7 @@ class OrderController extends Controller
                     $get = Invoice::find($invoice->id);
                     $ord->prefix = $get->prefix;
                 }
-        
+                
                 $mail = Mail::to($customer_email)->bcc($cs->email)->send(new Emailsend($data));
                 //$mail = Mail::to("aizaz.hussain@orangeroomdigital.com")->bcc("aizazkalwar46@gmail.com")->bcc("muhammad.idrees@orangeroomdigital.com")->send(new Emailsend($data));
 
@@ -662,7 +666,7 @@ class OrderController extends Controller
         else if($driver){
             $orders = $order->export_orders_with_driver_and_status($order_by,$sort_by,$timestamp,$driver,$status,$customer,$from,$to,$state,$city);
         }
-        
+
         foreach($orders as $ord){
             $ord->driver = $order->fetch_assigned_driver_to_order($ord->id);
             $ord->products = $order->fetch_orderitems_with_quantity($ord->id);
@@ -726,5 +730,152 @@ class OrderController extends Controller
         $data['states'] = $states;
         $data['cities'] = $city;
         return $data;
+    }
+    public function orders_by_products(Request $request){
+        $order_by = $request->order_by;
+        $sort_by = $request->sort_by;
+        $from = $request->from;
+        $to = $request->to;
+        $product = $request->product;
+        $orders_arr = array();
+        $order = new Order;
+        $orders = $order->get_orders_by_products($order_by,$sort_by,$from,$to,$product);
+        $i = 1;
+        foreach($orders as $ord){
+            $ord->order_id = $ord->id;
+            $ord->id = $i++;
+            $ord->driver = $order->fetch_assigned_driver_to_order($ord->id);
+            $ord->products = $order->fetch_orderitems_with_quantity($ord->id);
+            foreach($ord->products as $ord_items){
+                $stock = Stock::where(['product_id'=>$ord_items->id])->first();
+                if($stock){
+                    $ord_items->stock = $stock->stock;
+                }
+                else{
+                    $ord_items->stock = 'Stock does not exist';
+                }
+               
+            }
+            $orders_arr[] = $ord;
+        }
+        
+        return response()->json($orders_arr, 200);
+
+    }
+    public function orders_by_customers(Request $request){
+        $order_by = $request->order_by;
+        $sort_by = $request->sort_by;
+        $from = $request->from;
+        $to = $request->to;
+        $customer = $request->customer;
+        $orders_arr = array();
+
+        $order = new Order;
+        $orders = $order->get_orders_by_customer($order_by,$sort_by,$from,$to,$customer);
+        foreach($orders as $ord){
+            $ord->driver = $order->fetch_assigned_driver_to_order($ord->id);
+            $ord->products = $order->fetch_orderitems_with_quantity($ord->id);
+            foreach($ord->products as $ord_items){
+                $stock = Stock::where(['product_id'=>$ord_items->id])->first();
+                if($stock){
+                    $ord_items->stock = $stock->stock;
+                }
+                else{
+                    $ord_items->stock = 'Stock does not exist';
+                }
+               
+            }
+            $orders_arr[] = $ord;
+        }
+        
+        return response()->json($orders_arr, 200);
+
+    }
+    public function orders_by_drivers(Request $request){
+        $order_by = $request->order_by;
+        $sort_by = $request->sort_by;
+        $from = $request->from;
+        $to = $request->to;
+        $driver = $request->driver;
+        $orders_arr = array();
+
+        $order = new Order;
+        $orders = $order->get_orders_by_driver($order_by,$sort_by,$from,$to,$driver);
+        foreach($orders as $ord){
+            $ord->driver = $order->fetch_assigned_driver_to_order($ord->id);
+            $ord->products = $order->fetch_orderitems_with_quantity($ord->id);
+            foreach($ord->products as $ord_items){
+                $stock = Stock::where(['product_id'=>$ord_items->id])->first();
+                if($stock){
+                    $ord_items->stock = $stock->stock;
+                }
+                else{
+                    $ord_items->stock = 'Stock does not exist';
+                }
+               
+            }
+            $orders_arr[] = $ord;
+        }
+        
+        return response()->json($orders_arr, 200);
+
+    }
+    public function orders_by_states(Request $request){
+        $order_by = $request->order_by;
+        $sort_by = $request->sort_by;
+        $from = $request->from;
+        $to = $request->to;
+        $state = $request->state;
+        $orders_arr = array();
+
+        $order = new Order;
+        $orders = $order->get_orders_by_state($order_by,$sort_by,$from,$to,$state);
+        foreach($orders as $ord){
+            $ord->driver = $order->fetch_assigned_driver_to_order($ord->id);
+            $ord->products = $order->fetch_orderitems_with_quantity($ord->id);
+            foreach($ord->products as $ord_items){
+                $stock = Stock::where(['product_id'=>$ord_items->id])->first();
+                if($stock){
+                    $ord_items->stock = $stock->stock;
+                }
+                else{
+                    $ord_items->stock = 'Stock does not exist';
+                }
+               
+            }
+            $orders_arr[] = $ord;
+        }
+        
+        return response()->json($orders_arr, 200);
+
+    }
+    public function orders_by_cities(Request $request){
+        $order_by = $request->order_by;
+        $sort_by = $request->sort_by;
+        $from = $request->from;
+        $to = $request->to;
+        $city = $request->city;
+        $orders_arr = array();
+
+        $order = new Order;
+        $orders = $order->get_orders_by_city($order_by,$sort_by,$from,$to,$city);
+        foreach($orders as $ord){
+            $ord->driver = $order->fetch_assigned_driver_to_order($ord->id);
+            $ord->products = $order->fetch_orderitems_with_quantity($ord->id);
+            foreach($ord->products as $ord_items){
+                $stock = Stock::where(['product_id'=>$ord_items->id])->first();
+                if($stock){
+                    $ord_items->stock = $stock->stock;
+                }
+                else{
+                    $ord_items->stock = 'Stock does not exist';
+                }
+               
+            }
+            $orders_arr[] = $ord;
+        }
+        
+        return response()->json($orders_arr, 200);
+
     }
 }

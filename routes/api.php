@@ -39,6 +39,7 @@ Route::post('product/{id}', 'ProductController@update');
 Route::delete('product/{id}', 'ProductController@destroy');
 
 Route::resource('order', 'OrderController');
+Route::get('search_order/{q}', 'OrderController@search_order');
 
 Route::post('status_change', 'OrderController@status_change');
 Route::get('order_by_user', 'OrderController@get_orders_by_user');
@@ -72,3 +73,8 @@ Route::get('/export_orders', 'OrderController@export_orders');
 Route::get('/recent_orders', 'OrderController@recent_orders');
 
 Route::get('/filter_listing', 'OrderController@filter_listing');
+Route::get('/orders_by_products', 'OrderController@orders_by_products');
+Route::get('/orders_by_customers', 'OrderController@orders_by_customers');
+Route::get('/orders_by_drivers', 'OrderController@orders_by_drivers');
+Route::get('/orders_by_states', 'OrderController@orders_by_states');
+Route::get('/orders_by_cities', 'OrderController@orders_by_cities');

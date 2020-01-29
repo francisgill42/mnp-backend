@@ -14,6 +14,7 @@ class Stock extends Model
         $now = date('Y-m-d', strtotime('+1 day'));
         $bw = array('', $now);
         if($from && $to){
+            $to = date('Y-m-d', strtotime($to.' +1 day'));
             $bw = array($from, $to);
         }
         if($product){
