@@ -218,6 +218,7 @@ class Order extends Model
             ->orWhere('orders.order_total', 'like', '%'.$id.'%')
             ->orWhere('orders.created_at', 'like', '%'.$id.'%')
             ->orWhere('statuses.status', 'like', '%'.$id.'%')
+            ->orWhere('statuses.keyword', 'like', '%'.$id.'%')
             ->orWhere('users.company_name', 'like', '%'.$id.'%')
             ->orWhere('users.contact_person_name', 'like', '%'.$id.'%')
             ->orWhere('users.mobile_number', 'like', '%'.$id.'%')

@@ -18,6 +18,8 @@ class MaintenanceUserController extends Controller
         $to = $request->to;
         $status = $request->status;
         $customer = $request->customer;
+        $scheduling = $request->scheduling;
+        $type = $request->type;
 
         $customer_id = Auth::user()->id;
         $role_id = Auth::user()->role_id;
@@ -30,7 +32,7 @@ class MaintenanceUserController extends Controller
             $get_requests = $requests->get_all_requests_by_maintenanceuser();
         }
         else{
-            $get_requests = $requests->get_all_requests($from, $to, $status, $customer);
+            $get_requests = $requests->get_all_requests($from, $to, $status, $customer, $scheduling, $type);
         }
 
         foreach($get_requests as $request){
@@ -97,7 +99,7 @@ class MaintenanceUserController extends Controller
                 $req = Maintenanceuser::find($request_id);
                 $status = Status::find($status_id);
                 $arr['status_id'] = $status->id;
-                $arr['status_text'] = $status->status;
+                $arr['keyword'] = $status->keyword;
                 $arr['schedule'] = $req->schedule;
                 $arr['request'] = $req;
                 $res = true;

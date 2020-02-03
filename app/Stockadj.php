@@ -18,7 +18,7 @@ class Stockadj extends Model
 
             return $stockadj;
     }
-    public function get_adjustments_with_filter($from, $to, $product){
+    public function get_adjustments_with_filter($from, $to, $product, $reason){
         $args = array();
         $now = date('Y-m-d', strtotime('+1 day'));
         $bw = array('', $now);
@@ -30,6 +30,9 @@ class Stockadj extends Model
         }
         if($product){
             $args[] = array('stockadjs.product_id', '=', $product);
+         }
+         if($reason){
+            $args[] = array('stockadjs.reason', '=', $reason);
          }
     
         $stockadj = DB::table('stockadjs')

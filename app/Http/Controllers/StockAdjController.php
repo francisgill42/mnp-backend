@@ -23,9 +23,10 @@ class StockAdjController extends Controller
         $from = $request->from;
         $to = $request->to;
         $product = $request->product;
+        $reason = $request->reason;
         $stock_adj = new Stockadj;
         $data = array();
-        $adj = $stock_adj->get_adjustments_with_filter($from, $to, $product);
+        $adj = $stock_adj->get_adjustments_with_filter($from, $to, $product, $reason);
         foreach($adj as $st){
             $stock = Stock::where(['product_id'=>$st->product_id])->first();
             if($stock){
