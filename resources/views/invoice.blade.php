@@ -121,10 +121,10 @@
                            
                             <td class="title" style="width:50%;">                                
                                 <p style="text-transform:lowercase ; text-transform:capitalize; font-size: 14px; margin-bottom: 0;line-height: 20px; margin-top: 0;padding-left:10px;font-weight:700;">United Cool General Trading</p>
+                                <p style="text-transform:lowercase ; text-transform:capitalize; font-size: 14px; margin-bottom: 0;line-height: 20px; margin-top: 0;padding-left:10px;">VAT #: <?php echo $order->ntn; ?></p>
                                 <p style="text-transform:lowercase ; text-transform:capitalize; font-size: 14px; margin-bottom: 0;line-height: 20px; margin-top: 0;padding-left:10px;">(MÖVENPICK Ice Cream)</p>
                                 <p style="text-transform:lowercase ; text-transform:capitalize; font-size: 14px; margin-bottom: 0;line-height: 20px; margin-top: 0;padding-left:10px;">Dubai, U.A.E.</p>
                                 <p style="text-transform:lowercase ; text-transform:capitalize; font-size: 14px; margin-bottom: 0;line-height: 20px; margin-top: 0;padding-left:10px;">P.O. Box #: 232180</p>
-                                <p style="text-transform:lowercase ; text-transform:capitalize; font-size: 14px; margin-bottom: 0;line-height: 20px; margin-top: 0;padding-left:10px;">VAT #: <?php echo $order->ntn; ?></p>
                             </td>
                             <td>
                                 <h3 style="padding:0;margin:0; text-align:left;padding-left:15px;">Bank Account Details</h3>
@@ -134,26 +134,29 @@
                                         <td style="text-align: left; padding-bottom:3px;">United Cool General Trading LLC</td>
                                     </tr>
                                     <tr>
-                                        <td style="text-align: left; padding-bottom:3px;"><strong>Bank Name: </strong></td>
-                                        <td style="text-align: left; padding-bottom:3px;">Emirates Islamic Bank </td>
+                                        <td style="text-align: left; padding-bottom:3px;"><strong>Bank: </strong></td>
+                                        <td style="text-align: left; padding-bottom:3px;">Emirates NBD </td>
                                     </tr>
                                     <tr>
-                                        <td style="text-align: left; padding-bottom:3px;"><strong>Branch:</strong></td>
-                                        <td style="text-align: left; padding-bottom:3px;">Al Halwan Branch, Sharjah, Uae </td>
+                                        <td style="text-align: left; padding-bottom:3px;"><strong>Branch Name:</strong></td>
+                                        <td style="text-align: left; padding-bottom:3px;">Jumeirah Branch </td>
                                     </tr>
                                     <tr>
-                                        <td style="text-align: left; padding-bottom:3px;"><strong>Bank Account#: </strong></td>
-                                        <td style="text-align: left; padding-bottom:3px;">3707261991002</td>
+                                        <td style="text-align: left; padding-bottom:3px;"><strong>Branch Code:</strong></td>
+                                        <td style="text-align: left; padding-bottom:3px;">1213 </td>
                                     </tr>
                                     <tr>
-                                        <td style="text-align: left; padding-bottom:3px;"><strong>Bank Swift Code: </strong></td>
-                                        <td style="text-align: left; padding-bottom:3px;">MEBLAEADXXX </td>
+                                        <td style="text-align: left; padding-bottom:3px;"><strong>Account Number: </strong></td>
+                                        <td style="text-align: left; padding-bottom:3px;">1015681013401</td>
                                     </tr>
                                     <tr>
-                                        <td style="text-align: left; padding-bottom:3px;"><strong>IBAN:</strong></td>
-                                        <td style="text-align: left; padding-bottom:3px;">AE670340003707261991002</td>
+                                        <td style="text-align: left; padding-bottom:3px;"><strong>IBAN Number:</strong></td>
+                                        <td style="text-align: left; padding-bottom:3px;">AE840260001015681013401</td>
                                     </tr>
-                                   
+                                    <tr>
+                                        <td style="text-align: left; padding-bottom:3px;"><strong>Swift Code: </strong></td>
+                                        <td style="text-align: left; padding-bottom:3px;">EBILAED </td>
+                                    </tr>
                                 </table>
                                
                             </td>
@@ -287,18 +290,18 @@
         } 
         ?>       
 
-            <tr class="total" style="text-align:right;">
+<tr class="total" style="text-align:right;">
                 <td colspan="3"></td>
                 
                 <td colspan="3" style="font-weight:bold;border-top: 2px solid #eee;">
-                   Sub-Total: AED <?php echo $order->order_gross; ?>
+                   Sub-Total: AED <?php echo number_format($order->order_gross,2); ?>
                 </td>
             </tr>
             <tr class="total" style="text-align:right;">
                 <td colspan="3"></td>
                 
                 <td colspan="3" style="font-weight:bold;border-top: 2px solid #eee;">
-                   VAT: AED <?php echo $order->order_tax; ?>
+                   VAT: AED <?php echo number_format($order->order_tax,2); ?>
                 </td>
             </tr>
             <?php if($order->discounted_price){ ?>
@@ -306,7 +309,7 @@
                 <td colspan="3"></td>
                 
                 <td colspan="3" style="font-weight:bold;border-top: 2px solid #eee;">
-                   Discount: AED <?php echo $order->discounted_price; ?>
+                   Discount: AED <?php echo number_format($order->discounted_price,2); ?>
                 </td>
             </tr>
             <?php } ?>
@@ -314,7 +317,7 @@
                 <td colspan="3"></td>
                 
                 <td colspan="3" style="font-weight:bold;border-top: 2px solid #eee;">
-                   Grand Total: AED <?php echo $order->order_total; ?>
+                   Grand Total: AED <?php echo number_format($order->order_total,2); ?>
                 </td>
             </tr>
         </table>

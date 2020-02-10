@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Validator;
 use App\Customer;
 use App\Discount;
+use App\Discount_Product;
+use App\Product;
 class CustomerController extends Controller
 {
 public function __construct()
@@ -19,17 +21,19 @@ public function index()
     $customers = Customer::get_customers_with_additionals();
     foreach($customers as $customer){
         $customer_category_id = $customer->customer_category_id;
-        $customer->discount_amount = 0;
-        $discount = Discount::all();
-            foreach($discount as $disc){
-                $classes = json_decode($disc->customer_category_id);
-                foreach($classes as $class){
-                    if($class == $customer_category_id){
-                        $customer->discount_type = $disc->discount_type;
-                        $customer->discount_amount = $disc->discount_amount;
-                    }
-                }
+        $discount = Discount::where(['customer_category_id'=>$customer_category_id])->first();
+        if($discount){
+            $pro_arr = array();
+            $products = Discount_Product::where(['discount_id'=>$discount->id])->get();
+            
+            foreach($products as $product){
+                $get_pro = Product::find($product->product_id);
+                $get_pro->discount_amount = $product->amount;
+                $pro_arr[] = $get_pro;
             }
+            $customer->products = $pro_arr;
+        }
+        
             $arr[] = $customer;
     } 
     return $arr;
@@ -149,8 +153,8 @@ $updated = \DB::table('users')->where('id',$id)->update($arr);
 if($updated) {
 
 $user =  \DB::table('users')
- ->join('customer_categories', 'users.customer_category_id', '=', 'customer_categories.id')
- ->join('states', 'users.state_id', '=', 'states.id')
+->join('customer_categories', 'users.customer_category_id', '=', 'customer_categories.id')
+->join('states', 'users.state_id', '=', 'states.id')
 ->join('cities', 'users.city_id', '=', 'cities.id')
 ->select(
     'users.*',

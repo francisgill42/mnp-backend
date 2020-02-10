@@ -55,7 +55,7 @@ class MaintenanceUserController extends Controller
         $filename = 'req_'.uniqid().'.jpg';
         
         $ifp = fopen( public_path('uploads/requests/'.$filename), 'wb' ); 
-        $data = explode( ',', $image);
+        //$data = explode( ',', $image);
         fwrite( $ifp, base64_decode( $image));
         fclose( $ifp );
         $filename = asset('uploads/requests/'.$filename); 
@@ -86,7 +86,7 @@ class MaintenanceUserController extends Controller
         $arr = array();
 
             if(isset($scheduling)){
-                $status_id = 2;
+                //$status_id = 2;
                 $update = Maintenanceuser::where('id', $request_id)->update(['status'=>$status_id, 'schedule'=>$scheduling]);
             }
             else{
@@ -97,7 +97,8 @@ class MaintenanceUserController extends Controller
                 $req = Maintenanceuser::find($request_id);
                 $status = Status::find($status_id);
                 $arr['status_id'] = $status->id;
-                $arr['status_text'] = $status->status;
+                $arr['keyword'] = $status->keyword;
+                $arr['schedule'] = $req->schedule;
                 $arr['request'] = $req;
                 $res = true;
                 $msg = "Status Changed Successfully";

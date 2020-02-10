@@ -16,9 +16,9 @@ class Emailsend extends Mailable
      *
      * @return void
      */
-    public function __construct($data)
+    public function __construct($order)
     {
-        $this->order = $data;
+        $this->order = $order;
     }
 
     /**

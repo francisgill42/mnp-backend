@@ -21,4 +21,8 @@ Route::post('request_update', 'MaintenanceUserController@request_update');*/
 
 Route::get('/emailtemplate', 'OrderController@send_email');
 Route::get('/export', 'OrderController@export');
+Route::get('/import', 'ExcelController@index');
+Route::post('/import_data', 'ExcelController@import_data');
+
 Route::get('/pdf_export', 'OrderController@pdf_export');
+Route::get('generate-pdf','PDFController@generatePDF');

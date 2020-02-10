@@ -60,7 +60,7 @@ class AdminController extends Controller
         foreach($todays as $orddaily){
             $daily += $orddaily->order_total;
         }
-		$datadaily['orders_amount'] = $daily;
+		$datadaily['orders_amount'] = round($daily);
 		$count['daily_orders'] = $datadaily;
 
 	/*------------ Weekly orders ---------------- */	
@@ -71,7 +71,7 @@ class AdminController extends Controller
         foreach($weeks as $ordweek){
             $week += $ordweek->order_total;
         }
-        $dataweek['orders_amount'] = $week;
+        $dataweek['orders_amount'] = round($week);
 		$count['weekly_orders'] = $dataweek;
 
 	/*------------ Monthly orders ---------------- */	

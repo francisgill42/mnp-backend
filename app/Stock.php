@@ -41,4 +41,14 @@ class Stock extends Model
 
             return $stock;
     }
+    public function get_stock_with_product_by_p_id($id)
+    {
+        $stock = DB::table('stocks')
+            ->join('products', 'stocks.product_id', '=', 'products.id')
+            ->select('stocks.id as stock_id', 'stocks.stock', 'stocks.created_at as stock_created', 'products.*')
+            ->where('stocks.product_id', '=', $id)
+            ->first();
+
+            return $stock;
+    }
 }

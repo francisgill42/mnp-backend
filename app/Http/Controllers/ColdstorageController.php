@@ -82,6 +82,8 @@ return $id;
 public function update(Request $request, $id){
 
 
+
+
 $validator = Validator::make($request->all(), [ 
 'password' => 'min:6', 
 ]); 

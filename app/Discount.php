@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use DB;
 class Discount extends Model
 {
-    protected $fillable = ['customer_category_id','discount_type','discount_title','discount_amount'];
+    protected $fillable = ['customer_category_id','discount_type','discount_title','discount_amount','product_id'];
     
     public function get_discounts_with_group(){
         $discounts = DB::table('discounts')

@@ -78,3 +78,5 @@ Route::get('/orders_by_customers', 'OrderController@orders_by_customers');
 Route::get('/orders_by_drivers', 'OrderController@orders_by_drivers');
 Route::get('/orders_by_states', 'OrderController@orders_by_states');
 Route::get('/orders_by_cities', 'OrderController@orders_by_cities');
+
+Route::post('/import', 'ExcelController@import_data');

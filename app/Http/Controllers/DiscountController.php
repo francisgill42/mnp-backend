@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Validator;
 use App\Discount;
+use App\Discount_Product;
 use App\CustomerCategory;
+use App\Product;
 class DiscountController extends Controller
 {
     public function __construct()
@@ -17,12 +19,18 @@ class DiscountController extends Controller
         $data = array();
         $discounts = Discount::orderBy('id', 'desc')->get();
         foreach($discounts as $disc){
-            $categories = json_decode($disc->customer_category_id);
             $cat_arr = array();
-            foreach($categories as $category){
-                $cat_arr[] = CustomerCategory::find($category); 
-            }
+            $cat_arr[] = CustomerCategory::find($disc->customer_category_id); 
             $disc->categories = $cat_arr;
+            $pro_arr = array();
+            $products = Discount_Product::where(['discount_id'=>$disc->id])->get();
+            
+            foreach($products as $product){
+                $get_pro = Product::find($product->product_id);
+                $get_pro->discount_amount = $product->amount;
+                $pro_arr[] = $get_pro;
+            }
+            $disc->products = $pro_arr;
             $data[] = $disc;
         }
         return response($data);
@@ -30,10 +38,9 @@ class DiscountController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [ 
-            'customer_category_ids' => 'required', 
+            'customer_category_id' => 'required', 
             'discount_type' => 'required', 
-            'discount_title' => 'required',
-            'discount_amount' => 'required'
+            'discount_title' => 'required'
             ]); 
             if ($validator->fails()) { 
             
@@ -45,24 +52,34 @@ class DiscountController extends Controller
             }
 
 
-        $customer_category_ids = json_encode($request->customer_category_ids);
+        $customer_category_id = $request->customer_category_id;
         $discount_type = $request->discount_type;
         $discount_title = $request->discount_title;
-        $discount_amount  =$request->discount_amount;
+        
+        $products = $request->products;
+       
         $res = false;
         $msg = "";
         
-        $insert = Discount::create(['customer_category_id'=>$customer_category_ids, 'discount_type'=>$discount_type, 'discount_title'=>$discount_title, 'discount_amount'=>$discount_amount]);
+        $insert = Discount::create(['customer_category_id'=>$customer_category_id, 'discount_type'=>$discount_type, 'discount_title'=>$discount_title]);
             if($insert){
+                $id = $insert->id;
+                $pro_arr = array();
+                foreach($products as $product){
+                    $discount_Products = Discount_Product::create(['discount_id'=>$id, 'product_id'=>$product['product_id'], 'amount'=>$product['amount']]);
+                    $get_pro = Product::find($product['product_id']);
+                    $get_pro->discount_amount = $product['amount'];
+                    $pro_arr[] = $get_pro;
+                }
+                
                 $res = true;
                 $msg = "Discount Added Successfully";
 
-                $categories = json_decode($customer_category_ids);
                 $cat_arr = array();
-                foreach($categories as $category){
-                    $cat_arr[] = CustomerCategory::find($category); 
-                }
+                $cat_arr[] = CustomerCategory::find($customer_category_id); 
+                
                 $insert->categories = $cat_arr;
+                $insert->products = $pro_arr;
             }
 
         return response(['response_status'=>$res, 'message'=>$msg, 'new_record'=>$insert]);
@@ -70,7 +87,7 @@ class DiscountController extends Controller
 
 
     public function update_discount(Request $request){
-
+        
     }
 
 
@@ -80,10 +97,9 @@ class DiscountController extends Controller
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [ 
-            'customer_category_ids' => 'required', 
+            'customer_category_id' => 'required', 
             'discount_type' => 'required', 
-            'discount_title' => 'required',
-            'discount_amount' => 'required'
+            'discount_title' => 'required'
             ]); 
             if ($validator->fails()) { 
             
@@ -94,24 +110,39 @@ class DiscountController extends Controller
             
             }
 
-        $customer_category_ids = json_encode($request->customer_category_ids);
+        $customer_category_id = $request->customer_category_id;
         $discount_type = $request->discount_type;
         $discount_title = $request->discount_title;
-        $discount_amount = $request->discount_amount;
+
+        $products = $request->products;
         $res = false;
         $msg = "";
         $data = array();
         
-        $update = Discount::where('id', $id)->update(['customer_category_id'=>$customer_category_ids, 'discount_type'=>$discount_type, 'discount_title'=>$discount_title, 'discount_amount'=>$discount_amount]);
+        $update = Discount::where('id', $id)->update(['customer_category_id'=>$customer_category_id, 'discount_type'=>$discount_type, 'discount_title'=>$discount_title]);
             if($update){
                 $fetch = Discount::find($id);
-                
-                    $categories = json_decode($fetch->customer_category_id);
-                    $cat_arr = array();
-                    foreach($categories as $category){
-                        $cat_arr[] = CustomerCategory::find($category); 
+                $pro_arr = array();
+                foreach($products as $product){
+                    $pro = Discount_Product::where(['discount_id'=>$id, 'product_id'=>$product['product_id']])->first();
+                    if(empty($pro)){
+                        $discount_Products = Discount_Product::create(['discount_id'=>$id, 'product_id'=>$product['product_id'], 'amount'=>$product['amount']]);
+                        $get_pro = Product::find($product['product_id']);
+                        $get_pro->discount_amount = $product['amount'];
+                        $pro_arr[] = $get_pro;
                     }
+                    else{
+                        $discount_Products = Discount_Product::where('id', $pro->id)->update(['discount_id'=>$id, 'amount'=>$product['amount']]);
+                        $get_pro = Product::find($product['product_id']);
+                        $get_pro->discount_amount = $product['amount'];
+                        $pro_arr[] = $get_pro;
+                    }
+                }
+                
+                    $cat_arr = array();
+                    $cat_arr[] = CustomerCategory::find($fetch->customer_category_id); 
                     $fetch->categories = $cat_arr;
+                    $fetch->products = $pro_arr;
                     $data[] = $fetch;
 
                 $res = true;

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Product;
 use App\Stock;
 use App\Discount;
+use App\Discount_Product;
 use Illuminate\Http\Request;
 use DB;
 use Illuminate\Support\Str;
@@ -24,7 +25,10 @@ class ProductController extends Controller
       $products = (Auth::user()->master) ? Product::all() :
             Product::where('IsActive',1)->get();
       
-      $role_id = Auth::user()->role_id;      
+      $role_id = Auth::user()->role_id;
+      $user_id = Auth::user()->id;
+      $customer_category_id = Auth::user()->customer_category_id;
+
         foreach($products as $product){
             $stocks = Stock::where('product_id',$product->id)->get();
             $product->stock = $stocks;
@@ -35,18 +39,18 @@ class ProductController extends Controller
             }
 
         if($role_id == 1){
-            $customer_category_id = Auth::user()->customer_category_id;
-            $discount = Discount::all();
             $product->discount = null;
+            $discount = Discount::where(['customer_category_id'=>$customer_category_id])->get();
             foreach($discount as $disc){
-                $classes = json_decode($disc->customer_category_id);
-                foreach($classes as $class){
-                    if($class == $customer_category_id){
-                        $product->discount = $disc;
-                    }
+                $pro_discount = Discount_Product::where(['discount_id'=>$disc->id,'product_id'=>$product->id])->first();
+                if($pro_discount){
+                    $product->discount = $pro_discount->amount;
                 }
+                else{
+                    $product->discount = null;
+                }
+                
             }
-
         }
             $all_products[] = $product;
         }

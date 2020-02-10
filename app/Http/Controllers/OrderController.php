@@ -294,10 +294,10 @@ class OrderController extends Controller
                     $get = Invoice::find($invoice->id);
                     $ord->prefix = $get->prefix;
                 }
-                
-                $mail = Mail::to($customer_email)->bcc($cs->email)->send(new Emailsend($data));
+                if(empty($driver[0])){
+                $mail = Mail::to($customer_email)->bcc([$cs->email, 'customer.service@unitedcool.com'])->send(new Emailsend($data));
                 //$mail = Mail::to("aizaz.hussain@orangeroomdigital.com")->bcc("aizazkalwar46@gmail.com")->bcc("muhammad.idrees@orangeroomdigital.com")->send(new Emailsend($data));
-
+		}
             }
 
             $date = date("d-m-Y", strtotime(NOW()));
