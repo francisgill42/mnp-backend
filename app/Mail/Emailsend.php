@@ -11,14 +11,17 @@ class Emailsend extends Mailable
 {
     use Queueable, SerializesModels;
     public $order;
+    public $pdf;
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($order)
+    public function __construct($data, $pdf, $inv_name)
     {
-        $this->order = $order;
+        $this->order = $data;
+        $this->pdf = $pdf;
+        $this->inv_name = $inv_name;
     }
 
     /**
@@ -29,6 +32,7 @@ class Emailsend extends Mailable
     public function build()
     {
         return $this->subject('Order Placed')
-                ->view('invoice');
+                ->view('invoice')
+                ->attachData($this->pdf->output(), $this->inv_name.".pdf");
     }
 }

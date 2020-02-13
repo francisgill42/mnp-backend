@@ -20,6 +20,7 @@ use App\State;
 use App\City;
 use App\Exports\UsersExport;
 use Maatwebsite\Excel\Facades\Excel;
+use PDF;
 class OrderController extends Controller
 {
     public function __construct()
@@ -295,9 +296,12 @@ class OrderController extends Controller
                     $ord->prefix = $get->prefix;
                 }
                 if(empty($driver[0])){
-                $mail = Mail::to($customer_email)->bcc([$cs->email, 'customer.service@unitedcool.com'])->send(new Emailsend($data));
-                //$mail = Mail::to("aizaz.hussain@orangeroomdigital.com")->bcc("aizazkalwar46@gmail.com")->bcc("muhammad.idrees@orangeroomdigital.com")->send(new Emailsend($data));
-		}
+                $pdf_data = array('order'=>$data);
+                $pdf = PDF::loadView('myPDF', $pdf_data);
+                $inv_name = $data->prefix.''.$data->invoice_number;
+                $mail = Mail::to($customer_email)->bcc([$cs->email, 'customer.service@unitedcool.com'])->send(new Emailsend($data, $pdf, $inv_name));
+                //$mail = Mail::to("aizaz.hussain@orangeroomdigital.com")->bcc("")->bcc("muhammad.idrees@orangeroomdigital.com")->send(new Emailsend($data, $pdf, $inv_name));
+		        }
             }
 
             $date = date("d-m-Y", strtotime(NOW()));

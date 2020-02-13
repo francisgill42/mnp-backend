@@ -107,11 +107,11 @@
                     <table>
                         <tr>
                             <td class="title">
-                                <img src="https://orangeroomdigital.com/mnp/public/uploads/invoice/united-cool-logo.jpg" style="width:100%; max-width:200px;">
+                                <img src="https://orangeroomdigital.com/mnp_dev/public/uploads/invoice/united-cool-logo.jpg" style="width:100%; max-width:200px;">
                             </td>
                             
                             <td>
-                                <img src="https://orangeroomdigital.com/mnp/public/uploads/invoice/movenpick-logo.jpg" style="width:100%; max-width:200px;float:right;">
+                                <img src="https://orangeroomdigital.com/mnp_dev/public/uploads/invoice/movenpick-logo.jpg" style="width:100%; max-width:200px;float:right;">
                             </td>
                         </tr>
                         <tr>

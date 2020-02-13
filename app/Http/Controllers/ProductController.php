@@ -44,7 +44,8 @@ class ProductController extends Controller
             foreach($discount as $disc){
                 $pro_discount = Discount_Product::where(['discount_id'=>$disc->id,'product_id'=>$product->id])->first();
                 if($pro_discount){
-                    $product->discount = $pro_discount->amount;
+                    $disc->discount_amount = $pro_discount->amount;
+                    $product->discount = $disc;
                 }
                 else{
                     $product->discount = null;
