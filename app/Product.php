@@ -19,6 +19,10 @@ class Product extends Model
 		'weight',
 		'expiry_date',
 		'IsActive',
+		'group_code',
+		'group_description',
+		'pack_code',
+		'pack_description'
         ];
 
          public static function get_products_with_categories(){
@@ -30,19 +34,6 @@ class Product extends Model
 	       ->get();
          
 		}
-
-		//    return DB::table('products')
-	    //    ->join('categories', 'products.product_category_id', '=', 'categories.id')
-		//    ->select('categories.id as product_category_id','categories.category',
-		//    'products.id as product_id',
-		//    'products.id as product_title',
-		//    'products.id as product_price',
-		//    'products.expiry_date as product_expiry',
-		//    'product_image'
-		//    )
-	    //    ->orderBy('products.id','desc')
-	    //    ->get();
-		 
 		
 		public static function get_products_with_stock(){
 			return DB::table('products')

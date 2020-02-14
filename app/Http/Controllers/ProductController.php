@@ -143,6 +143,10 @@ class ProductController extends Controller
             'weight' => $request->weight,
             'expiry_date' => $request->expiry_date,
             'IsActive' => $request->IsActive,
+            'group_code' => $request->group_code,
+            'group_description' =>$request->group_description,
+            'pack_code' =>$request->pack_code,
+            'pack_description' =>$request->pack_description,
             'created_at' => now(),
             'updated_at' => now() 
         
@@ -164,7 +168,8 @@ class ProductController extends Controller
             'weight' => 'required',
             'description' => 'required',
             'file' => 'required',
-            
+            'group_code' => 'required',
+            'pack_code' => 'required',      
         ]);
 
 
@@ -186,7 +191,11 @@ class ProductController extends Controller
             'unit_in_case'          => $request->unit_in_case,
             'weight'                => $request->weight,
             'expiry_date'           => $request->expiry_date,
-            'IsActive'              => $status
+            'IsActive'              => $status,
+            'group_code'            => $request->group_code,
+            'group_description'     => $request->group_description,
+            'pack_code'             => $request->pack_code,
+            'pack_description'      => $request->pack_description
        ]);
         
        if($product){
