@@ -288,6 +288,7 @@ class OrderController extends Controller
                     $ord->invoice_number = $inv_nmbr;
                     $ord->delivery_date = $scheduling;
                     $ord->payment_due_date = $due_date;
+                    $ord->driver = $order_info->fetch_assigned_driver_to_order($order_id);
                     $ord->products = $order_info->fetch_orderitems_with_quantity($order_id);
                     $data = $ord;
 
@@ -322,6 +323,7 @@ class OrderController extends Controller
                 $status = Status::find($status_id);
                 $arr['id'] = $status->id;
                 $arr['status'] = $status->status;
+                $arr['keyword'] = $status->keyword;
                 $res = true;
                 if($flag){
                     $msg = "Order Assigned Successfully";
@@ -334,7 +336,13 @@ class OrderController extends Controller
                 $res = false;
                 $msg = "Status not Changed. Try Again";
             }
-        return response(['response_status'=>$res, 'message'=>$msg, 'updated_record'=>$arr]);
+            if($status_id == 2){
+                return response(['response_status'=>$res, 'message'=>$msg, 'updated_record'=>$data]);
+            }
+            else{
+                return response(['response_status'=>$res, 'message'=>$msg, 'updated_record'=>$arr]);
+            }
+        
     }
 
     public function get_orders_by_user(){
