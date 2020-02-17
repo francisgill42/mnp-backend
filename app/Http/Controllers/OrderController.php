@@ -288,9 +288,17 @@ class OrderController extends Controller
                     $ord->invoice_number = $inv_nmbr;
                     $ord->delivery_date = $scheduling;
                     $ord->payment_due_date = $due_date;
-                    $ord->driver = $order_info->fetch_assigned_driver_to_order($order_id);
-                    $ord->products = $order_info->fetch_orderitems_with_quantity($order_id);
-                    foreach($ord->products as $ord_items){
+                    $data = $ord;
+
+                    $invoice = Invoice::create(['invoice_number'=>$inv_nmbr, 'order_id'=>$order_id, 'customer_id'=>$ord->user_id, 'invoice_status'=>1]);
+                    $get = Invoice::find($invoice->id);
+                    $ord->prefix = $get->prefix;
+                }
+                $get_order2 = $order_info->fetch_orders_by_id($order_id);
+                foreach($get_order2 as $get_ord){
+                    $get_ord->driver = $order_info->fetch_assigned_driver_to_order($order_id);
+                    $get_ord->products = $order_info->fetch_orderitems_with_quantity($order_id);
+                    foreach($get_ord->products as $ord_items){
                         $stock = Stock::where(['product_id'=>$ord_items->id])->first();
                         if($stock){
                             $ord_items->stock = $stock->stock;
@@ -298,13 +306,8 @@ class OrderController extends Controller
                         else{
                             $ord_items->stock = 'Stock does not exist';
                         }
-                       
                     }
-                    $data = $ord;
-
-                    $invoice = Invoice::create(['invoice_number'=>$inv_nmbr, 'order_id'=>$order_id, 'customer_id'=>$ord->user_id, 'invoice_status'=>1]);
-                    $get = Invoice::find($invoice->id);
-                    $ord->prefix = $get->prefix;
+                    $data2 = $get_ord;
                 }
                 if(empty($driver[0])){
                 $pdf_data = array('order'=>$data);
@@ -347,7 +350,7 @@ class OrderController extends Controller
                 $msg = "Status not Changed. Try Again";
             }
             if($status_id == 2){
-                return response(['response_status'=>$res, 'message'=>$msg, 'updated_record'=>$data]);
+                return response(['response_status'=>$res, 'message'=>$msg, 'updated_record'=>$data2]);
             }
             else{
                 return response(['response_status'=>$res, 'message'=>$msg, 'updated_record'=>$arr]);
