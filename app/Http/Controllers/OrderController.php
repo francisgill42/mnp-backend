@@ -290,6 +290,16 @@ class OrderController extends Controller
                     $ord->payment_due_date = $due_date;
                     $ord->driver = $order_info->fetch_assigned_driver_to_order($order_id);
                     $ord->products = $order_info->fetch_orderitems_with_quantity($order_id);
+                    foreach($ord->products as $ord_items){
+                        $stock = Stock::where(['product_id'=>$ord_items->id])->first();
+                        if($stock){
+                            $ord_items->stock = $stock->stock;
+                        }
+                        else{
+                            $ord_items->stock = 'Stock does not exist';
+                        }
+                       
+                    }
                     $data = $ord;
 
                     $invoice = Invoice::create(['invoice_number'=>$inv_nmbr, 'order_id'=>$order_id, 'customer_id'=>$ord->user_id, 'invoice_status'=>1]);
