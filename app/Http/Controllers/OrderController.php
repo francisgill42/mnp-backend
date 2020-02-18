@@ -298,6 +298,20 @@ class OrderController extends Controller
                     $get = Invoice::find($invoice->id);
                     $ord->prefix = $get->prefix;
                 }
+                
+                if(empty($driver[0])){
+                $pdf_data = array('order'=>$data);
+                $pdf = PDF::loadView('myPDF', $pdf_data);
+                $inv_name = $data->prefix.''.$data->invoice_number;
+                $mail = Mail::to($customer_email)->bcc([$cs->email, 'customer.service@unitedcool.com'])->send(new Emailsend($data, $pdf, $inv_name));
+                //$mail = Mail::to("aizaz.hussain@orangeroomdigital.com")->bcc("")->bcc("muhammad.idrees@orangeroomdigital.com")->send(new Emailsend($data, $pdf, $inv_name));
+		        }
+            }
+
+            $date = date("d-m-Y", strtotime(NOW()));
+            if($status_id == 2){
+                $update = Order::where('id', $order_id)->update(['order_status_id'=>$status_id, 'order_confirmed_date'=>$date, 'delivery_date'=>$scheduling, 'payment_due_date'=>$due_date]);
+                
                 $get_order2 = $order_info->fetch_orders_by_id($order_id);
                 foreach($get_order2 as $get_ord){
                     $get_ord->driver = $order_info->fetch_assigned_driver_to_order($order_id);
@@ -313,18 +327,6 @@ class OrderController extends Controller
                     }
                     $data2 = $get_ord;
                 }
-                if(empty($driver[0])){
-                $pdf_data = array('order'=>$data);
-                $pdf = PDF::loadView('myPDF', $pdf_data);
-                $inv_name = $data->prefix.''.$data->invoice_number;
-                $mail = Mail::to($customer_email)->bcc([$cs->email, 'customer.service@unitedcool.com'])->send(new Emailsend($data, $pdf, $inv_name));
-                //$mail = Mail::to("aizaz.hussain@orangeroomdigital.com")->bcc("")->bcc("muhammad.idrees@orangeroomdigital.com")->send(new Emailsend($data, $pdf, $inv_name));
-		        }
-            }
-
-            $date = date("d-m-Y", strtotime(NOW()));
-            if($status_id == 2){
-                $update = Order::where('id', $order_id)->update(['order_status_id'=>$status_id, 'order_confirmed_date'=>$date, 'delivery_date'=>$scheduling, 'payment_due_date'=>$due_date]);
             }
             else if($status_id == 3){
                 $update = Order::where('id', $order_id)->update(['order_status_id'=>$status_id, 'order_shipped_date'=>$date]);
