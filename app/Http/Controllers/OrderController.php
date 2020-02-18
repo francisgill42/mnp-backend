@@ -245,10 +245,13 @@ class OrderController extends Controller
                     return response(['response_status'=>false, 'message'=>$msg]);
                 }
                 else{
-                    foreach($items as $order_item){   
-                        $stock2 = Stock::where(['product_id'=> $order_item->product_id])->get();
-                        $cal = ($stock2[0]->stock-$order_item->product_quantity);
-                        $update2 = Stock::where('id', $stock2[0]->id)->update(['stock'=>$cal]);
+                    $ord_status = Order::find($order_id);
+                    if($ord_status->order_status_id == 1){
+                        foreach($items as $order_item){   
+                            $stock2 = Stock::where(['product_id'=> $order_item->product_id])->get();
+                            $cal = ($stock2[0]->stock-$order_item->product_quantity);
+                            $update2 = Stock::where('id', $stock2[0]->id)->update(['stock'=>$cal]);
+                        }
                     }
                 }
 
@@ -288,6 +291,7 @@ class OrderController extends Controller
                     $ord->invoice_number = $inv_nmbr;
                     $ord->delivery_date = $scheduling;
                     $ord->payment_due_date = $due_date;
+                    $ord->products = $order_info->fetch_orderitems_with_quantity($order_id);
                     $data = $ord;
 
                     $invoice = Invoice::create(['invoice_number'=>$inv_nmbr, 'order_id'=>$order_id, 'customer_id'=>$ord->user_id, 'invoice_status'=>1]);
