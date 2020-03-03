@@ -11,7 +11,10 @@
 |
 */
 
-Route::get('/', 'ProductController@product_form');
+// Route::get('/', function(){
+//     echo "hi";
+//     //return redirect()->away('http://localhost/Projects_Laravel/mnp-backend/public/dist');
+// });
 Route::post('/add-product', 'ProductController@add_product');
 
 /*Route::get('/update_req', function(){

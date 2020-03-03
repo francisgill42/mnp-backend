@@ -212,7 +212,7 @@ class OrderController extends Controller
      */
 
     public function status_change(Request $request)
-    {        
+    {              
         $order_id = $request->order_id;
         $status_id = $request->status_id;
         $driver_id = $request->driver_id;
@@ -299,13 +299,27 @@ class OrderController extends Controller
                     $ord->prefix = $get->prefix;
                 }
                 
-                if(empty($driver[0])){
-                $pdf_data = array('order'=>$data);
-                $pdf = PDF::loadView('myPDF', $pdf_data);
+                //if(empty($driver[0])){
+                // $pdf_data = array('order'=>$data);
+                // $pdf = PDF::loadView('myPDF', $pdf_data);
                 $inv_name = $data->prefix.''.$data->invoice_number;
-                $mail = Mail::to($customer_email)->bcc([$cs->email, 'customer.service@unitedcool.com'])->send(new Emailsend($data, $pdf, $inv_name));
+
+
+                $params=['data'=>json_encode($data), 'inv_name'=>$inv_name, 'customer_email'=>$customer_email, 'cs'=>$cs->email];
+                $defaults = array(
+                CURLOPT_URL => 'http://localhost/Projects_laravel/email_sender/api/send_email',
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => $params,
+                );
+                $ch = curl_init();
+                curl_setopt_array($ch, ($defaults));
+                $output = curl_exec($ch);
+                curl_close($ch);  
+                // print_r($output);
+                // die;
+                //$mail = Mail::to($customer_email)->bcc([$cs->email, 'customer.service@unitedcool.com'])->send(new Emailsend($data, $pdf, $inv_name));
                 //$mail = Mail::to("aizaz.hussain@orangeroomdigital.com")->bcc("")->bcc("muhammad.idrees@orangeroomdigital.com")->send(new Emailsend($data, $pdf, $inv_name));
-		        }
+		        //}
             }
 
             $date = date("d-m-Y", strtotime(NOW()));

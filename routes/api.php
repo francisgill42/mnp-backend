@@ -2,6 +2,12 @@
 
 use Illuminate\Http\Request;
 
+
+Route::get('test', function (){
+    echo "hi api";
+});
+
+
 Route::post('login', 'AuthController@login');
 Route::post('register', 'AuthController@register');
 
