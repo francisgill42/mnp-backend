@@ -299,7 +299,7 @@ class OrderController extends Controller
                     $ord->prefix = $get->prefix;
                 }
                 
-                //if(empty($driver[0])){
+                if(empty($driver[0])){
                 // $pdf_data = array('order'=>$data);
                 // $pdf = PDF::loadView('myPDF', $pdf_data);
                 $inv_name = $data->prefix.''.$data->invoice_number;
@@ -307,7 +307,7 @@ class OrderController extends Controller
 
                 $params=['data'=>json_encode($data), 'inv_name'=>$inv_name, 'customer_email'=>$customer_email, 'cs'=>$cs->email];
                 $defaults = array(
-                CURLOPT_URL => 'http://localhost/Projects_laravel/email_sender/api/send_email',
+                CURLOPT_URL => 'https://orangeroomdigital.com/email_sender/public/api/send_email',
                 CURLOPT_POST => true,
                 CURLOPT_POSTFIELDS => $params,
                 );
@@ -319,7 +319,7 @@ class OrderController extends Controller
                 // die;
                 //$mail = Mail::to($customer_email)->bcc([$cs->email, 'customer.service@unitedcool.com'])->send(new Emailsend($data, $pdf, $inv_name));
                 //$mail = Mail::to("aizaz.hussain@orangeroomdigital.com")->bcc("")->bcc("muhammad.idrees@orangeroomdigital.com")->send(new Emailsend($data, $pdf, $inv_name));
-		        //}
+		        }
             }
 
             $date = date("d-m-Y", strtotime(NOW()));
