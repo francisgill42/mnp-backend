@@ -70,7 +70,7 @@ class ProductController extends Controller
         if($request->hasFile('product_image')){
            $product_image = $request->product_image->getClientOriginalName();
            $request->product_image->move(public_path('uploads/product_images/'),$product_image);
-           $product_image = asset('uploads/product_images/' . $product_image);
+           $product_image = asset('public/uploads/product_images/' . $product_image);
         }
             $data = Product::create($this->fields($request,$product_image));
 
@@ -86,7 +86,7 @@ class ProductController extends Controller
         if($request->hasFile('product_image')){
             $product_image = $request->product_image->getClientOriginalName();
             $request->product_image->move(public_path('uploads/product_images/'),$product_image);
-            $product_image = asset('uploads/product_images/' . $product_image);
+            $product_image = asset('public/uploads/product_images/' . $product_image);
         }
         else{
             $product_image = $request->product_image;
