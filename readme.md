@@ -1,10 +1,11 @@
-Follow the commands before running the application.
+Installation Guide
 
-1 php artisan key:generate
 
-2 composer update
+1 composer update
 
-3 copy .env.example .env and env configuration with database
+2 copy .env.example .env AND env configuration with database
+
+3 php artisan key:generate
 
 4 php artisan migrate
 
